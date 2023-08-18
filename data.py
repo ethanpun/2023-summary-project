@@ -109,10 +109,9 @@ class Grid:
         while k < 5:
             if self.grid[random.randint(0, 4)][random.randint(0, 4)] == None:
                 self.grid[random.randint(0, 4)][random.randint(0, 4)] = {'type' : 'items', 'items':[]}
-                k = k + 1
-        
+            k = k + 1
         self.coordinates = [x, y]
-        
+
         
     def get_position(self) -> list:
         '''
@@ -156,7 +155,7 @@ class Grid:
         else:
             return False
             
-    def get_item(self, coordinates : list) -> str:
+    def get_items(self, coordinates : list) -> str:
         '''
         If user is on an item tile, return the item on that tile
         '''
@@ -380,7 +379,7 @@ class Springtrap:
                 print(f'Status: {status}')
 
     def encounter():
-        if Room.current_room() == '?':
+        #if current_room() == '?':
             print('You notice the pungent smell of decaying matter.')
             time.sleep(2)
             print('Then, you hear the clanking of metal wires and robotic movement.')
@@ -634,6 +633,16 @@ class Freddy:
         else:
             return None
 
+    def prompt_light():
+        L = input('Do you want to increase or decrease your light level: ')
+        if 'increase' in L.lower():
+            return L
+        elif 'decrease' in L.lower():
+            return L
+        elif 'back' in L.lower():
+            return L
+        else:
+            print('Please choose either increase, decrease or back.')
 
 #Status
 def sleep(target):

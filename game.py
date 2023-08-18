@@ -24,7 +24,7 @@ def victory(enemies: list) -> bool:
 class MUDGame:
     def __init__(self):
         # self.spawn = Room('home', up='closed')
-        # self.boss = data.spawn_boss()
+        self.boss = data.Springtrap.encounter()
         self.current_room = data.start_room()
         self.gameOver = False
         self.player1 = None
@@ -45,7 +45,6 @@ class MUDGame:
 
     def run(self):
         data.start_menu()
-        n = 1
         for player in [
                 'self.player1', 'self.player2', 'self.player3', 'self.player4'
         ]:
@@ -55,16 +54,15 @@ class MUDGame:
                 if character != None:
                     valid = True
             if character.lower() == 'freddy':
-                self.set_player(player, Freddy())
+                self.set_player(player, data.Freddy())
             elif character.lower() == 'bonnie':
-                self.set_player(player, Bonnie())
+                self.set_player(player, data.Bonnie())
             elif character.lower() == 'chica':
-                self.set_player(player, Chica())
+                self.set_player(player, data.Chica())
             elif character.lower() == 'foxy':
-                self.set_player(player, Foxy())
+                self.set_player(player, data.Foxy())
             elif character.lower() == 'skip':
                 break
-            n = n + 1
         while not self.gameOver:
             if not self.current_room.grid.is_encounter():
                 #prompt movement
@@ -91,49 +89,23 @@ class MUDGame:
                     self.current_room.grid.move([0, 2])
                     continue
                 elif self.current_room.grid.get_position() == [2, 4] and input == 'd':
-                    self.current_room.next_room(input)
-                if self.current_room.grid.get_position() == [
-                        0, 2
-                ] and input == 'w':
-                    self.current_room.nextRoom(input)
-                    self.current_room.grid.move([4, 2])
-                    continue
-                elif self.current_room.grid.get_position() == [
-                        2, 0
-                ] and input == 'a':
-                    self.current_room.nextRoom(input)
-                    self.current_room.grid.move([2, 4])
-                    continue
-                elif self.current_room.grid.get_position() == [
-                        4, 2
-                ] and input == 's':
-                    self.current_room.nextRoom(input)
-                    self.current_room.grid.move([0, 2])
-                    continue
-                elif self.current_room.grid.get_position() == [
-                        2, 4
-                ] and input == 'd':
                     self.current_room.nextRoom(input)
                     self.current_room.grid.move([2, 0])
                     continue
                 #moving in current room
-                if input.lower(
-                ) == 'w' and self.current_room.grid.get_position()[0] != 0:
+                if input.lower() == 'w' and self.current_room.grid.get_position()[0] != 0:
                     current_position = self.current_room.grid.get_position()
                     current_position[1] = current_position[1] + 1
                     self.current_room.grid.move(current_position)
-                elif input.lower(
-                ) == 's' and self.current_room.grid.get_position()[0] != 4:
+                elif input.lower() == 's' and self.current_room.grid.get_position()[0] != 4:
                     current_position = self.current_room.grid.get_position()
                     current_position[1] = current_position[1] - 1
                     self.current_room.grid.move(current_position)
-                elif input.lower(
-                ) == 'a' and self.current_room.grid.get_position()[1] != 0:
+                elif input.lower() == 'a' and self.current_room.grid.get_position()[1] != 0:
                     current_position = self.current_room.grid.get_position()
                     current_position[0] = current_position[0] - 1
                     self.current_room.grid.move(current_position)
-                elif input.lower(
-                ) == 'd' and self.current_room.grid.get_position()[1] != 4:
+                elif input.lower() == 'd' and self.current_room.grid.get_position()[1] != 4:
                     current_position = self.current_room.grid.get_position()
                     current_position[0] = current_position[0] + 1
                     self.current_room.grid.move(current_position)
@@ -208,7 +180,11 @@ class MUDGame:
                             active_character.get_stats()
                             continue
                         elif action.lower() == 'light':
-                            input = active_character.prompt_light()
+                            valid = False
+                            while not valid:
+                                input = active_character.prompt_light()
+                                if input in ['back', 'increase', 'decrease']:
+                                    valid = True
                             if input == 'increase':
                                 active_character.increase_light(10)
                             elif input.lower() == 'decrease':
@@ -216,14 +192,15 @@ class MUDGame:
                             elif input.lower() == 'back':
                                 continue
                         elif action.lower() == 'item':
+                            continue
                             #Remove defeated characters
-                            for character in turn_order:
-                                if character.is_defeated():
-                                    turn_order.remove(character)
-                                if character in enemy_list:
-                                    enemy_list.remove(character)
-                                elif character in player_list:
-                                    player_list.remove(character)
+                    for character in turn_order:
+                        if character.is_defeated():
+                            turn_order.remove(character)
+                        if character in enemy_list:
+                            enemy_list.remove(character)
+                        elif character in player_list:
+                            player_list.remove(character)
                     k = k + 1
                 if defeat(player_list):
                     self.gameOver = True

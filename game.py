@@ -243,7 +243,8 @@ class MUDGame:
                     k = (k + 1) % len(turn_order)
             elif self.current_room.is_boss():
                 #Boss Fight
-                self.boss.encounter()
+                self.current_room.display_room()
+                print('Battle started.\n')
                 #Determine turn order
                 player_list = [
                     self.player1, self.player2, self.player3, self.player4
@@ -252,43 +253,49 @@ class MUDGame:
                 turn_order = []
                 i = 0
                 while len(player_list) != 0 and len(enemy_list) != 0:
-                    if player_list[i] != None:
-                        turn_order.append(player_list[i])
-                    turn_order.append(enemy_list[i])
-                    player_list.pop(i)
-                    enemy_list.pop(i)
-                    i = i + 1
+                    if len(player_list) != 0:
+                        if player_list[i] != None:
+                            turn_order.append(player_list[i])
+                            player_list.pop(i)
+                    if len(enemy_list) != 0:
+                        turn_order.append(enemy_list[i])
+                        enemy_list.pop(i)
                 #Combat
                 player_list = [
                     self.player1, self.player2, self.player3, self.player4
                 ]
                 player_list = [player for player in player_list if player != None]
                 enemy_list = [self.boss]
-                k = 0
+                k = 0                        
+                target = None
                 while not data.is_defeat(player_list) and not data.is_victory(
                         enemy_list):
-                    active_character = turn_order[k % (len(turn_order))]
+                    active_character = turn_order[(k % len(turn_order))]
                     if active_character.has_status('Sleeping'):
                         print(f"{active_character.name} is asleep.")
                         k = (k + 1) % len(turn_order)
                         continue
                     active_character.display_turn()
                     if active_character in enemy_list:
+                        time.sleep(1)
                         target = random.choice(player_list)
                         if active_character.has_status('Corrupted'):
                             target = random.choice(turn_order)
                         active_character.attack(target)
-                    elif active_character in player_list:
                         target = None
+                    elif active_character in player_list:
                         action = active_character.prompt_action()
+                        while action not in ['attack', 'target', 'stats', 'item', '1', '2' ,'3', '4']:
+                            print(f'Select a valid action. Got {action}')
+                            action = active_character.prompt_action()
                         if active_character.has_status('Corrupted'):
                             target = random.choice(turn_order)
                             active_character.attack(target, '1')
                             k = (k + 1) % len(turn_order)
                             continue
-                        if action == 'attack':
+                        if action == 'attack' or action == '1':
                             if target == None:
-                                print('Choose an enemy to target.')
+                                print('Choose an enemy to target.\n')
                                 continue
                             skill = active_character.prompt_attack()
                             while skill not in ['1', '2', '3', 'back']:
@@ -300,10 +307,15 @@ class MUDGame:
                                 continue
                             else:
                                 active_character.attack(target, skill)
-                        elif action.lower() == 'target':
-                            target = enemy_list[active_character.target() - 1]
+                                target = None
+                        elif action.lower() == 'target' or action == '2':
+                            target = active_character.target(enemy_list)
+                            while not target.isdigit() or int(target) > len(enemy_list):
+                                print(f'Enter a number corresponding to the surviving enemies. Got {target}.')
+                                target = active_character.target()
+                            target = enemy_list[int(target) - 1]
                             continue
-                        elif action.lower() == 'check':
+                        elif action.lower() == 'check' or action == '3':
                             check = active_character.prompt_check()
                             while check not in ['back', 'enemy', 'party']:
                                 print(
@@ -317,19 +329,21 @@ class MUDGame:
                                 for ally in player_list:
                                     ally.get_stats()
                             continue
-                        elif action.lower() == 'item':
+                        elif action.lower() == 'item' or action == '4':
                             is_use = active_character.is_use_item()
                             while is_use not in ['y', 'n']:
                                 print("Type 'Y' or 'N'.")
                                 is_use = active_character.is_use_item()
                             if is_use == 'y':
-                                while active_character.is_use_item() == 'y':
-                                    active_character.display_inventory()
-                                    item = input('Choose an item to use: ')
-                                    used = active_character.use_item(item)
-                                    if used:
-                                        k = (k + 1) % len(turn_order)
-                                        break
+                                data.display_inventory()
+                                item = input("Choose an item to use. To cancel, enter 'cancel': ")
+                                item = item.lower()
+                                if item == 'cancel':
+                                    continue
+                                print('')
+                                used = active_character.use_item(item)
+                                if not used:
+                                    continue
                         else:
                             print(
                                 f'Please select a valid action. Got {action}.')
@@ -339,19 +353,18 @@ class MUDGame:
                         if character.is_defeated():
                             if k >= turn_order.index(character):
                                 k = k - 1
-                            turn_order.remove(character)
                             print(f"{character.name} has died.")
-                        if character in enemy_list:
-                            enemy_list.remove(character)
-                        elif character in player_list:
-                            player_list.remove(character)
+                            turn_order.remove(character)
+                            if character in enemy_list:
+                                enemy_list.remove(character)
+                            elif character in player_list:
+                                player_list.remove(character)
                     #Reduce count of status effects
                     active_character.remove_status()
+                    #Check if victory or defeat
                     if data.is_defeat(player_list):
                         self.gameOver = True
-                        print(
-                            "Party defeated. Looks like you'll forgotten, just like the other animatronics down here who met their demise."
-                        )
+                        print("Party defeated. Looks like you'll forgotten, just like the other animatronics down here who met their demise.")
                         break
                     elif data.is_victory(
                             enemy_list) and self.boss.name == 'Springtrap':
@@ -366,4 +379,5 @@ class MUDGame:
                             enemy_list) and self.boss.name == 'Glitchtrap':
                         self.gameOver = True
                         data.Ending()
+                        break
                     k = (k + 1) % len(turn_order)

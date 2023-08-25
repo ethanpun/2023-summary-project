@@ -1,6 +1,6 @@
 #test
 # from main import game
-
+import time
 import data
 import game
 
@@ -20,7 +20,7 @@ Test the Normal Room and Grid class for errors.
 ===============================================
 '''
 try:
-    test_grid = data.Grid("normal")
+    test_grid = data.Grid("normal", 2, 2)
 except:
     print("Grid cannot be instantiated")
 try:
@@ -76,45 +76,87 @@ else:
 
 
 '''
-==================================================
-Test the Grid class for errors.
-==================================================
+========================
+Test the attack (Freddy)
+========================
 '''
 
-# try:
-#     test_grid_obj = data.Grid(2, 2)
-    
-#     if test_grid_obj.get_position() != [2, 2]:
-#         print("Grid positioning does not work properly.")
-#     else:
-#         print("Grid position is ok.")
-    
-# except:
-#     print("Grid cannot instantiate (the function does not work).")
-# test_grid_obj.move([0,0])
-
-# for x in range(0, 5):
-#     for y in range(0, 5):
-#         pos = [x, y]
-#         print(pos)
-#         try:
-#             if test_grid_obj.is_encounter():
-#                 print(test_grid_obj.get_enemies())
-#         except:
-#             print("is_encounter() does not work")
-#         test_grid_obj.move(pos)
-
-# print("Grid instantiated with no issues.")
-
-
+HEALTH = 500
+test_freddy = data.Freddy()
+test_BB = data.BB(health = HEALTH)
         
+while test_BB.is_defeated() == False:
+    test_freddy.attack(test_BB, "1")
+    print(f'test_BB health is now {test_BB.health}')
+print("""
+Freddy attack 1 passed
+""")
+time.sleep(2)
+test_BB.health = HEALTH
+
+while not test_BB.has_status("Sleeping"):
+    test_freddy.attack(test_BB, "2")
+    test_BB.get_stats()
+while test_BB.has_status("Sleeping"):
+    test_BB.remove_status()
+print("""
+Freddy attack 2 (status move) passed
+""")
+time.sleep(2)
+
+while test_BB.is_defeated() == False:
+    test_freddy.attack(test_BB, "3")
+    print(f'test_BB health is now {test_BB.health}')
+print("""
+Freddy attack 3 passed
+""")
+time.sleep(2)
+test_BB.health = HEALTH
+
+
+'''
+========================
+Test the attack (Bonnie)
+========================
+'''
+
+HEALTH = 500
+test_bonnie = data.Bonnie()
+test_BB = data.BB(health = HEALTH)
         
-        
+while test_BB.is_defeated() == False:
+    test_bonnie.attack(test_BB, "1")
+    print(f'test_BB health is now {test_BB.health}')
     
-        
+print("""
+Bonnie attack 1 passed
+""")
+time.sleep(2)
+test_BB.health = HEALTH
+
+while not test_BB.has_status("Resonance"):
+    test_bonnie.attack(test_BB, "2")
+    test_BB.health = HEALTH
+    test_BB.get_stats()
+
+while test_BB.has_status("Resonance"):
+    test_BB.remove_status()
+print("""
+Bonnie attack 2 (status move) passed
+""")
+time.sleep(2)
+
+while test_BB.is_defeated() == False:
+    test_bonnie.attack(test_BB, "3")
+    print(f'test_BB health is now {test_BB.health}')
     
-    # try:
-    #     test.run()
-    # except:
-    #     print("The game cannot run lmao.")
+print("""
+Bonnie attack 3 passed
+""")
+time.sleep(2)
+test_BB.health = HEALTH
+
+
+
+
 

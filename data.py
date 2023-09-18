@@ -111,11 +111,6 @@ def display_inventory():
     print('--------------------------------------------------------')
         
 
-#Converting to json
-
-def to_json(data):
-    return json.dumps(data, indent=4)
-    
 #Rooms
 total_rooms = 0
 def increment_total_rooms():

@@ -3,88 +3,8 @@ import time
 import json 
 
 #Inventory and Items
-all_items = [
-    {
-        'name': 'Loose bolts',
-        'description':
-        'A pile of rusty parts found from the crushed remains of robots. Most noticeably, a pair of rusted springlocks are in the midst of the devastation.',
-        'effect': 'Heals user for 10 hp.',
-        'consumable': True,
-        'heal': 20,
-        'type': 'healing'
-    },
-    {
-        'name': 'Functioning Limb',
-        'description':
-        'While the animatronic is torn beyond recognition, some part of it is still salvageable.',
-        'effect': 'Heals user for 20 hp.',
-        'consumable': True,
-        'heal': 20,
-        'type': 'healing'
-    },
-    {
-        'name': 'Metal Pipe',
-        'description': 'A ventilation pipe. It\'s stained with blood.',
-        'effect': 'Increases users attack damage by 10.',
-        'consumable': True,
-        'damage': 10,
-        'type': 'weapon'
-    },
-    {
-        'name': 'Hatchet',
-        'description': 'The hatchet brings you an unsettling feeling',
-        'effect': 'Increases users attack damage by 15.',
-        'consumable': True,
-        'damage': 15,
-        'type': 'weapon'
-    },
-    {
-        'name': 'Battery',
-        'description':
-        'A battery found from a camera. It still functions with the remaining power left in it.',
-        'effect': 'Heals user for 30 hp.',
-        'consumable': True,
-        'heal': 30,
-        'type': 'healing'
-    },
-    {
-        'name': 'Freddy Figurine',
-        'description':
-        'It brings you nostalgia. The microphone in the toy\'s hands is gone.',
-        'effect':
-        'If the selected character is Freddy, increase damage by 5. Else, it\'s a pretty cool figurine isn\'t it.',
-        'consumable': False,
-        'damage': 5
-        
-    },
-    {
-        'name': 'Bonnie Figurine',
-        'description':
-        'It brings you nostalgia. The guitar in the toy\'s hands is gone.',
-        'effect':
-        'If the selected character is Bonnie, increase damage by 5. Else, it\'s a pretty cool figurine isn\'t it.',
-        'consumable': False,
-        'damage': 5
-    },
-    {
-        'name': 'Chica Figurine',
-        'description':
-        'It brings you nostalgia. You notice that the beak of the figurine is missing.',
-        'effect':
-        'If the selected character is Chica, increase damage by 5. Else, it\'s a pretty cool figurine isn\'t it.',
-        'consumable': False,
-        'damage': 5
-    },
-    {
-        'name': 'Foxy Figurine',
-        'description':
-        'It brings you nostalgia. The hook in the toy\'s hands is gone.',
-        'effect':
-        'If the selected character is Foxy, increase damage by 5. Else, it\'s a pretty cool figurine isn\'t it.',
-        'consumable': False,
-        'damage': 5
-    }
-]
+with open("items.json", "r") as f:
+    all_items = json.load(f)
 
 player_inventory = []
 
@@ -356,60 +276,35 @@ def start_menu():
             choice = input("Type 'Start' to begin: ")
         print('--------------------------------------------------------')
 
-    
-def info(cr):
+
+with open("characters.json", "r") as f:
+    char_info = json.load(f)
+
+def info(name: str):
     """
     Displays information of the playable characters
     """
-    if cr == 'freddy':
-        print('HP: 100')
-        print('Description: The lovable brown bear enters the dungeon, ready to face any and all challenges in his way. With his trusty microphone, Freddy faces fear head on as he ventures deeper into the spiraling depths of the abyss.')
-        print('Passive: Freddy does increased damage against enemies that are asleep.')
-        print('Attacks:')
-        print('1. Mic Toss : Deal minor damage to a single target.')
-        print('2. Sing : Put an enemy to sleep.')
-        print('3. The Bite : Deal massive damage to a single target.')
-        print('--------------------------------------------------------')
-        
-    elif cr == 'bonnie':
-        print('HP: 100')
-        print('Description: Bonnie the bunny is here and he is ready to stir up a storm. He treads through the treacherous dungeon as he sends rumbles through each room, pathing a way for him to dive deeper into the dungeons.')
-        print('Passive: Bonnie increases his attacks by a random amount if enemies are resonating with him.')
-        print('Attacks:')
-        print('1. Rift : Deal minor damage to a single target.')
-        print('2. Guitar crash : Deal moderate damage to a single target.')
-        print("3. Rock 'n' Roll : Chance to deal massive damage to a single target.")
-        print('--------------------------------------------------------')
-        
-    elif cr == 'chica':
-        print('HP: 100')
-        print('Description: Chica is afraid of the darkness, hence she brought her best friend along with her - cupcake. Cupcake reassures her constantly that everything will be fine and helps her get through the dungeons, yet honestly she just wants to go back to the pizzeria and feast on pizza. ')
-        print("Passive: Chica's cupcake heals her and when destroyed, explodes and deals damage to the opponent.")
-        print('Attacks:')
-        print('1. Pizza slice : Deal minor damage to a single target.')
-        print('2. Cupcake decoy : Deploy a cupcake that.')
-        print("3. Devour : Consume a cupcake to deal massive damage to a single target.")
-        print('--------------------------------------------------------')
-        
-    elif cr == 'foxy':
-        print('HP: 100')
-        print('Description: Foxy brandishes his hook, waiting for his next unsuspecting prey to walk past him as he lurks in the shadows. His unique eyes allow him to adapt to the darkness, but is also the reason why he is largely deterred from light sources. Though Foxy may be seen as arrogant and boastful by others, his band members know that he just wants to be able to be someone to somebody, in this case a better teammate for his friends.')
-        print('Passive: When Foxy has below half of his health, his hunter instincts kick in and he increases his attack.')
-        print('Attacks:')
-        print('1. Yar-Har : Deal minor damage to a single enemy.')
-        print('2. Harvest Moon : Increase own attack and accuracy.')
-        print("3. Death Grip : Deal massive damage to a single target and heal health.")
-        print('--------------------------------------------------------')
+    if name not in char_info:
+        return
+    character = char_info[name]
+    print(f'HP: {character["HP"]}')
+    print(f'Description: {character["Description"]}')
+    print(f'Passive: {character["Passive"]}')
+    print("Attacks:")
+    for i, (attack, desc) in enumerate(
+        character["Attacks"].items(),
+        start=1
+    ):
+        print(f'{i}. {attack}: {desc}')
+    print('--------------------------------------------------------')
     
 def choose_character(player):
     """
     Prompts the user to select a character to play as
     """
     print('Characters:')
-    print('1. Freddy Fazbear')
-    print('2. Bonnie')
-    print('3. Chica')
-    print('4. Foxy')
+    for i,character in enumerate(char_info.values(), start=1):
+        print(f'{i}. {character["Name"]}')
     cr = input(f"{player}, please select your character or enter 'skip' if you are ready to start the game: ")
     print('--------------------------------------------------------')
     cr = cr.lower()
@@ -477,39 +372,11 @@ def accuracy(accuracy, attacker, target):
         return True
     else:
         return False
-        
+
+
 #Status
-statuses = [{
-    'name': 'Sleeping',
-    'description':
-    'Target cannot take action based on the count. At the end of the target\'s turn, reduce the count by 1.',
-    'count': None
-}, {
-    'name': 'Corrupted',
-    'description':
-    'Target attacks indiscriminately, At the end of the turn, reduce the count by 1.',
-    'count': None
-}, {
-    'name': 'Infiltrated',
-    'description':
-    'Target takes 10% more damage when attacked by Glitch Type enemies. At the end of the turn, reduce count by 1.',
-    'count': None
-}, {
-    'name': 'Phantom',
-    'description':
-    'Target has an increased chance to dodge all attacks. At the end of the turn, reduce count by 1.',
-    'count': None
-}, {
-    'name': 'Resonance',
-    'description':
-    'Target gains a random damage boost between 1 and 10 extra damage. At the end of the turn, reduce count by 1.',
-    'count': None
-}, {
-    'name': 'Nightfall',
-    'description':
-    'Target increases their attack and accuracy of their skills, as well as gains the ability to leech of of the opponent\'s health. At the end of the turn, reduce count by 1.',
-    'count': None
-}]
+    with open("statuses.json", "r") as f:
+        statuses = json.load(f)
 
 
 def infiltrated(damage):

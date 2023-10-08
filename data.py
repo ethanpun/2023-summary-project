@@ -268,13 +268,12 @@ def start_menu():
     """
     Displays start menu 
     """
-        def start_menu():
-        print('Welcome to FNAF:Reckoning!')
+    print('Welcome to FNAF:Reckoning!')
+    choice = input("Type 'Start' to begin: ")
+    while choice.lower() != 'start':
+        print("To begin the game, enter 'start'.")
         choice = input("Type 'Start' to begin: ")
-        while choice.lower() != 'start':
-            print("To begin the game, enter 'start'.")
-            choice = input("Type 'Start' to begin: ")
-        print('--------------------------------------------------------')
+    print('--------------------------------------------------------')
 
 
 with open("characters.json", "r") as f:

@@ -1,0 +1,46 @@
+{
+    "freddy": {
+        "Name": "Freddy",
+        "HP": 100,
+        "Description": "The lovable brown bear enters the dungeon, ready to face any and all challenges in his way. With his trusty microphone, Freddy faces fear head on as he ventures deeper into the spiraling depths of the abyss.",
+        "Passive": "Freddy does increased damage against enemies that are asleep.",
+        "Attacks": {
+            "Mic Toss": "Deal minor damage to a single target.",
+            "Sing": "Put an enemy to sleep.",
+            "The Bite": "Deal massive damage to a single target."
+        }
+    },
+    "bonnie": {
+        "Name": "Bonnie",
+        "HP": 100,
+        "Description": "Bonnie the bunny is here and he is ready to stir up a storm. He treads through the treacherous dungeon as he sends rumbles through each room, pathing a way for him to dive deeper into the dungeons.",
+        "Passive": "Bonnie increases his attacks by a random amount if enemies are resonating with him.",
+        "Attacks": {
+            "Rift": "Deal minor damage to a single target.",
+            "Guitar crash": "Deal moderate damage to a single target.",
+            "Rock 'n' Roll": "Chance to deal massive damage to a single target."
+        }
+    },
+    "chica": {
+        "Name": "Chica",
+        "HP": 100,
+        "Description": "Chica is afraid of the darkness, hence she brought her best friend along with her - cupcake. Cupcake reassures her constantly that everything will be fine and helps her get through the dungeons, yet honestly she just wants to go back to the pizzeria and feast on pizza.",
+        "Passive": "Chica's cupcake heals her and when destroyed, explodes and deals damage to the opponent.",
+        "Attacks": {
+            "Pizza slice": "Deal minor damage to a single target.",
+            "Cupcake decoy": "Deploy a cupcake that.",
+            "Devour": "Consume a cupcake to deal massive damage to a single target."
+        }
+    },
+    "foxy": {
+        "Name": "Foxy",
+        "HP": 100,
+        "Description": "Foxy brandishes his hook, waiting for his next unsuspecting prey to walk past him as he lurks in the shadows. His unique eyes allow him to adapt to the darkness, but is also the reason why he is largely deterred from light sources. Though Foxy may be seen as arrogant and boastful by others, his band members know that he just wants to be able to be someone to somebody, in this case a better teammate for his friends.",
+        "Passive": "When Foxy has below half of his health, his hunter instincts kick in and he increases his attack.",
+        "Attacks": {
+            "Yar-Har": "Deal minor damage to a single enemy.",
+            "Harvest Moon": "Increase own attack and accuracy.",
+            "Death Grip": "Deal massive damage to a single target and heal health."
+        }
+    }
+}

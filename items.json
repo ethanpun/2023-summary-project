@@ -1,0 +1,70 @@
+[
+    {
+        "name": "Loose bolts",
+        "description": "A pile of rusty parts found from the crushed remains of robots. Most noticeably, a pair of rusted springlocks are in the midst of the devastation.",
+        "effect": "Heals user for 10 hp.",
+        "consumable": true,
+        "heal": 20,
+        "type": "healing"
+    },
+    {
+        "name": "Functioning Limb",
+        "description": "While the animatronic is torn beyond recognition, some part of it is still salvageable.",
+        "effect": "Heals user for 20 hp.",
+        "consumable": true,
+        "heal": 20,
+        "type": "healing"
+    },
+    {
+        "name": "Metal Pipe",
+        "description": "A ventilation pipe. It's stained with blood.",
+        "effect": "Increases users attack damage by 10.",
+        "consumable": true,
+        "damage": 10,
+        "type": "weapon"
+    },
+    {
+        "name": "Hatchet",
+        "description": "The hatchet brings you an unsettling feeling",
+        "effect": "Increases users attack damage by 15.",
+        "consumable": true,
+        "damage": 15,
+        "type": "weapon"
+    },
+    {
+        "name": "Battery",
+        "description": "A battery found from a camera. It still functions with the remaining power left in it.",
+        "effect": "Heals user for 30 hp.",
+        "consumable": true,
+        "heal": 30,
+        "type": "healing"
+    },
+    {
+        "name": "Freddy Figurine",
+        "description": "It brings you nostalgia. The microphone in the toy's hands is gone.",
+        "effect": "If the selected character is Freddy, increase damage by 5. Else, it's a pretty cool figurine isn't it.",
+        "consumable": false,
+        "damage": 5
+    },
+    {
+        "name": "Bonnie Figurine",
+        "description": "It brings you nostalgia. The guitar in the toy's hands is gone.",
+        "effect": "If the selected character is Bonnie, increase damage by 5. Else, it's a pretty cool figurine isn't it.",
+        "consumable": false,
+        "damage": 5
+    },
+    {
+        "name": "Chica Figurine",
+        "description": "It brings you nostalgia. You notice that the beak of the figurine is missing.",
+        "effect": "If the selected character is Chica, increase damage by 5. Else, it's a pretty cool figurine isn't it.",
+        "consumable": false,
+        "damage": 5
+    },
+    {
+        "name": "Foxy Figurine",
+        "description": "It brings you nostalgia. The hook in the toy's hands is gone.",
+        "effect": "If the selected character is Foxy, increase damage by 5. Else, it's a pretty cool figurine isn't it.",
+        "consumable": false,
+        "damage": 5
+    }
+]

@@ -169,34 +169,10 @@ class Character:
         raise NotImplementedError
 
     def attack(self, target, atk):
-        """Attacks a target using one of its attacks"""
-        damage = 0
-        damage += self.passive(target)
-        if self.item_equipped != None:
-            damage += self.item_equipped.damage
-        if atk == '1':
-            print(f'Freddy used Mic Toss on {target.name}!')
-            if combat.accuracy(90, self, target) == True:
-                damage += 15
-                print(f"{target.name} took {damage} damage!")
-                target.take_damage(damage)
-            else:
-                print('The attack missed!')
-        if atk == '2':
-            print(f'Freddy used Sing on {target.name}!')
-            if combat.accuracy(40, self, target) == True:
-                target.add_status('Sleeping', 2)
-            else:
-                print('The attack missed!')
-        if atk == '3':
-            print(f'Freddy used The Bite on {target.name}!')
-            if combat.accuracy(19, self, target) == True:
-                damage += 87
-                print(f"{target.name} took {damage} damage!")
-                target.take_damage(damage)
-            else:
-                print('The attack missed!')
-        print('\n')
+        """Attacks a target using one of its attacks.
+        Subclasses must implement this method.
+        """
+        raise NotImplementedError
 
     def passive(self, target):
         """Subclasses must implement this method."""

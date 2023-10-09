@@ -58,14 +58,15 @@ class Character:
         self.health = health
         self.status = status if status is not None else []
         self.item_equipped = None
+        self.inventory = inventory
 
     def display_inventory(self):
         """Displays a character's inventory"""
         print("Inventory:")
-        if len(player_inventory) == 0:
+        if self.inventory.is_empty():
             print("You don't have any items currently.")
         else:
-            for item in player_inventory:
+            for item in self.inventory.items():
                 name = item['name']
                 description = item['description']
                 effect = item['effect']
@@ -74,11 +75,9 @@ class Character:
 
     def add_item(self, item):
         """Adds items collected into the player's inventory"""
-        global player_inventory
-        global all_items
         for it in data.all_items:
             if it['name'] == item:
-                player_inventory.append(it)
+                self.inventory.add_item(it)
 
     def is_use_item(self):
         """Confirms with the player whether they want to use the item"""
@@ -94,15 +93,14 @@ class Character:
 
     def use_item(self, item):
         """Uses a selected item in the player's inventory"""
-        global player_inventory
-        for it in player_inventory:
+        for it in self.inventory.items():
             if it['name'] == item:
                 if not it['consumable']:  # If item can't be consumed
                     print("You can't consume this item.")
                     return False
                 if it['type'] == 'healing':  # If item is healing
                     self.heal(it['heal'])
-                    player_inventory.remove(it)
+                    self.inventory.remove_item(it)
                     return True
                 elif it['type'] == 'weapon':  # If item is weapon
                     if self.items_equipped != None:
@@ -112,7 +110,7 @@ class Character:
                         self.items_equipped.append(it)
                         name = it['name']
                         print(f'{self.name} has equipped {name}.')
-                        player_inventory.remove(it)
+                        self.inventory.remove_item(it)
                         return True
         print("You don't have this item.")
         return False

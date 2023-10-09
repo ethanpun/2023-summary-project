@@ -8,30 +8,34 @@ import enemies
 with open("items.json", "r") as f:
     all_items = json.load(f)
 
-player_inventory = []
 
-def get_inventory():
-    return player_inventory
+class Inventory:
+    """Class with methods for managing inventory.
 
-def add_item(item):
-    player_inventory.append(item)
-    print(f'You obtained {item}.\n')
+    Methods:
+    items() -> tuple[Item]
+    add_item(item) -> bool
+    remove_item(item) -> bool
+    """
+    def __init__(self) -> None:
+        pass
 
-def display_inventory():
-    print("Inventory:")
-    if len(player_inventory) == 0:
-        print("You don't have any items currently.")
-    else:
-        for item in player_inventory:
-            for x in all_items:
-                if x['name'] == item:
-                    name = x['name']
-                    description = item['description']
-                    effect = item['effect']
-                    consumable = item['consumable']
-            print(f'Item : {name}  /\t Description : {description}  /\t Effect : {effect}  /\t Consumable : {consumable}')
-    print('--------------------------------------------------------')
-        
+    def items(self) -> tuple["Item"]:
+        """Returns a tuple of all items in the inventory."""
+        pass
+
+    def add_item(self, item: "Item") -> bool:
+        """Add an item to inventory.
+        Return True if successful, False otherwise.
+        """
+        pass
+
+    def remove_item(self, item: "Item") -> bool:
+        """Remove an item from inventory.
+        Return True if successful, False otherwise.
+        """
+        pass
+
 
 #Rooms
 total_rooms = 0

@@ -237,7 +237,7 @@ class Grid:
                 tile_y_coord = random.randint(0, 4)
                 if self.grid[tile_x_coord][tile_y_coord] is None:
                     random_item = random.choice(all_items)
-                    self.grid[tile_x_coord][tile_y_coord] = {'type' : 'item', 'item' : random_item}
+                    self.grid[tile_x_coord][tile_y_coord] = {'type': 'item', 'item': random_item}
                     k = k + 1
         self.coordinates = [x, y]
 

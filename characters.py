@@ -73,11 +73,11 @@ class Character:
                 consumable = item['consumable']
                 print(f'Item : {name}  /\t Description : {description}  /\t Effect : {effect}  /\t Consumable : {consumable}')
 
-    def add_item(self, item):
+    def add_item(self, item: data.Item):
         """Adds items collected into the player's inventory"""
-        for it in data.all_items:
-            if it['name'] == item:
-                self.inventory.add_item(it)
+        for item in data.all_items:
+            if item.name == item:
+                self.inventory.add_item(item)
 
     def is_use_item(self):
         """Confirms with the player whether they want to use the item"""

@@ -63,7 +63,7 @@ class MUDGame:
                     move = self.current_room.grid.prompt_movement()
                 #Opening inventory
                 if move == 'inventory':
-                    data.display_inventory()
+                    self.player1.display_inventory()
                     continue
                 #entering next room
                 if self.current_room.grid.get_position() == [
@@ -209,7 +209,7 @@ class MUDGame:
                                 print("Type 'Y' or 'N'.")
                                 is_use = active_character.is_use_item()
                             if is_use == 'y':
-                                data.display_inventory()
+                                active_character.display_inventory()
                                 item = input("Choose an item to use. To cancel, enter 'cancel': ")
                                 item = item.lower()
                                 if item == 'cancel':
@@ -340,7 +340,7 @@ class MUDGame:
                                 print("Type 'Y' or 'N'.")
                                 is_use = active_character.is_use_item()
                             if is_use == 'y':
-                                data.display_inventory()
+                                active_character.display_inventory()
                                 item = input("Choose an item to use. To cancel, enter 'cancel': ")
                                 item = item.lower()
                                 if item == 'cancel':

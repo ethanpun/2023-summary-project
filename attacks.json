@@ -29,7 +29,9 @@
     {
         "name": "Rock 'n' Roll",
         "accuracy": 25,
-        "damage": "25*n, n ranges from 1 to 5"
+        "damage": 25,
+        "repeats": [1, 5]
+        
     },
     {
         "name": "Yar-Har",

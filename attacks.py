@@ -27,4 +27,7 @@ class Attack:
 
 
 with open("attacks.json", "r") as f:
-    all_attacks = [Attack(**record) for record in json.load(f)]
+    all_attacks = {
+        record["name"]: Attack(**record)
+        for record in json.load(f)
+    }

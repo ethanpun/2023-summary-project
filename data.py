@@ -4,9 +4,42 @@ import time
 
 import enemies
 
+class Item:
+    """Encapsulates items in the game."""
+    def __init__(self,
+                 name: str,
+                 description: str,
+                 effect: str,
+                 consumable: bool,
+                 type: "str | None" = None,
+                 heal: "int | None" = None,
+                 damage: "int | None" = None) -> None:
+        self.name = name
+        self.description = description
+        self.effect = effect
+        self.consumable = consumable
+        self.type = type
+        self.heal = heal
+        self.damage = damage
+
+    def __repr__(self) -> str:
+        return ("Item("
+                f"name={self.name}, "
+                f"description={self.description}, "
+                f"effect={self.effect}, "
+                f"consumable={self.consumable}, "
+                f"type={self.type}, "
+                f"heal={self.heal}, "
+                f"damage={self.damage})")
+        
+
 #Inventory and Items
+all_items = []
 with open("items.json", "r") as f:
-    all_items = json.load(f)
+    for record in json.load(f):
+        all_items.append(Item(**record))
+
+breakpoint()
 
 
 class Inventory:

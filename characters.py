@@ -1,43 +1,8 @@
+import random
 
+import combat
+import data
 
-#accuracy
-def accuracy(accuracy, attacker, target):
-    """
-    Determines whether an attack hits the opponent.
-    Can be changed by buffs or debuffs (statuses)
-    """
-    if target.has_status('Phantom'):
-        accuracy -= 10
-    if attacker.has_status('Nightfall'):
-        accuracy += 20
-    if accuracy <= 0:
-        return False
-    elif accuracy >= 100:
-        return True
-    hit = random.choice([True] * accuracy + [False] * (100 - accuracy))
-    if hit:
-        return True
-    else:
-        return False
-
-
-#Status
-    with open("statuses.json", "r") as f:
-        statuses = json.load(f)
-
-
-def infiltrated(damage):
-    """
-    Increases the damage taken by 10%
-    """
-    return abs(damage * 110 / 100)
-
-
-def instinct(damage):
-    """
-    Increases damage dealt by 30%
-    """
-    return abs(damage * 130 / 100)
 
 #Win and lose conditions
 def is_defeat(players: list) -> bool:
@@ -111,7 +76,7 @@ class Character:
         """Adds items collected into the player's inventory"""
         global player_inventory
         global all_items
-        for it in all_items:
+        for it in data.all_items:
             if it['name'] == item:
                 player_inventory.append(it)
 
@@ -217,7 +182,7 @@ class Character:
             damage += self.item_equipped['damage']
         if atk == '1':
             print(f'Freddy used Mic Toss on {target.name}!')
-            if accuracy(90, self, target) == True:
+            if combat.accuracy(90, self, target) == True:
                 damage += 15
                 print(f"{target.name} took {damage} damage!")
                 target.take_damage(damage)
@@ -225,13 +190,13 @@ class Character:
                 print('The attack missed!')
         if atk == '2':
             print(f'Freddy used Sing on {target.name}!')
-            if accuracy(40, self, target) == True:
+            if combat.accuracy(40, self, target) == True:
                 target.add_status('Sleeping', 2)
             else:
                 print('The attack missed!')
         if atk == '3':
             print(f'Freddy used The Bite on {target.name}!')
-            if accuracy(19, self, target) == True:
+            if combat.accuracy(19, self, target) == True:
                 damage += 87
                 print(f"{target.name} took {damage} damage!")
                 target.take_damage(damage)
@@ -245,7 +210,7 @@ class Character:
 
     def add_status(self, status, turns):
         """Adds status to a character"""
-        for st in statuses:
+        for st in combat.statuses:
             if st['name'] == status:
                 temp = st.copy()
                 temp['count'] = turns
@@ -328,7 +293,7 @@ class Freddy(Character):
             damage += self.item_equipped['damage']
         if atk == '1':
             print(f'Freddy used Mic Toss on {target.name}!')
-            if accuracy(90, self, target) == True:
+            if combat.accuracy(90, self, target) == True:
                 damage += 15
                 print(f"{target.name} took {damage} damage!")
                 target.take_damage(damage)
@@ -336,13 +301,13 @@ class Freddy(Character):
                 print('The attack missed!')
         if atk == '2':
             print(f'Freddy used Sing on {target.name}!')
-            if accuracy(40, self, target) == True:
+            if combat.accuracy(40, self, target) == True:
                 target.add_status('Sleeping', 2)
             else:
                 print('The attack missed!')
         if atk == '3':
             print(f'Freddy used The Bite on {target.name}!')
-            if accuracy(19, self, target) == True:
+            if combat.accuracy(19, self, target) == True:
                 damage += 87
                 print(f"{target.name} took {damage} damage!")
                 target.take_damage(damage)
@@ -404,7 +369,7 @@ class Bonnie(Character):
             damage += self.item_equipped['damage']
         if atk == '1':
             print(f'{self.name} used Rift on {target.name}!')
-            if accuracy(90, self, target) == True:
+            if combat.accuracy(90, self, target) == True:
                 damage += 15
                 print(f"{target.name} took {damage} damage!")
                 target.take_damage(damage)
@@ -412,7 +377,7 @@ class Bonnie(Character):
                 print('The attack missed!')
         if atk == '2':
             print(f'{self.name} used Guitar Crash on {target.name}!')
-            if accuracy(40, self, target) == True:
+            if combat.accuracy(40, self, target) == True:
                 damage += 10
                 self.heal(10)
                 print(f"{target.name} took {damage} damage!")
@@ -423,7 +388,7 @@ class Bonnie(Character):
                 print('The attack missed!')
         if atk == '3':
             print(f"{self.name} used Rock 'n' Roll on {target.name}!")
-            if accuracy(40, self, target) == True:
+            if combat.accuracy(40, self, target) == True:
                 hits = random.randint(1, 5)
                 damage += 25*hits
                 print(f'{target.name} was hit {hits} times!')
@@ -484,7 +449,7 @@ class Foxy(Character):
             damage += self.item_equipped['damage']
         if atk == '1':
             print(f'{self.name} used Yar-Har on {target.name}!')
-            if accuracy(90, self, target) == True:
+            if combat.accuracy(90, self, target) == True:
                 damage += 15
                 damage += self.passive(damage)
                 if self.has_status('Nightfall'):
@@ -501,7 +466,7 @@ class Foxy(Character):
             self.add_status('Nightfall', 5)
         if atk == '3':
             print(f"{self.name} used Death Grip on {target.name}!")
-            if accuracy(25, self, target) == True:
+            if combat.accuracy(25, self, target) == True:
                 damage += 125
                 damage += self.passive(damage)
                 if self.has_status('Nightfall'):
@@ -570,7 +535,7 @@ class Chica(Character):
             damage += self.item_equipped['damage']
         if atk == '1':
             print(f'{self.name} used Pizza slice on {target.name}!')
-            if accuracy(90, self, target) == True:
+            if combat.accuracy(90, self, target) == True:
                 damage += 15
                 print(f"{target.name} took {damage} damage!")
                 target.take_damage(damage)
@@ -585,7 +550,7 @@ class Chica(Character):
                 print('There is already a cupcake in place!')
         if atk == '3':
             print(f"{self.name} used Devour on {target.name}!")
-            if accuracy(40, self, target) == True:
+            if combat.accuracy(40, self, target) == True:
                 if self.cupcake > 0:
                     damage += 125
                     print(f"{self.name} devoured the cupcake. Damage Increased.")

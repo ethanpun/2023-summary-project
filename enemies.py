@@ -1,62 +1,7 @@
 import random
 import time
 
-
-#accuracy
-def accuracy(accuracy, attacker, target):
-    """
-    Determines whether an attack hits the opponent.
-    Can be changed by buffs or debuffs (statuses)
-    """
-    if target.has_status('Phantom'):
-        accuracy -= 10
-    if attacker.has_status('Nightfall'):
-        accuracy += 20
-    if accuracy <= 0:
-        return False
-    elif accuracy >= 100:
-        return True
-    hit = random.choice([True] * accuracy + [False] * (100 - accuracy))
-    if hit:
-        return True
-    else:
-        return False
-
-
-#Status
-    with open("statuses.json", "r") as f:
-        statuses = json.load(f)
-
-
-def infiltrated(damage):
-    """
-    Increases the damage taken by 10%
-    """
-    return abs(damage * 110 / 100)
-
-
-def instinct(damage):
-    """
-    Increases damage dealt by 30%
-    """
-    return abs(damage * 130 / 100)
-
-#Win and lose conditions
-def is_defeat(players: list) -> bool:
-    """
-    Returns True if user lost, else returns False
-    """
-    if len(players) == 0:
-        return True
-    return False
-
-def is_victory(enemies: list) -> bool:
-    """
-    Returns True if user won, else returns False
-    """
-    if len(enemies) == 0:
-        return True
-    return False
+import combat
 
 
 class Enemy:
@@ -101,7 +46,7 @@ class Enemy:
 
     def add_status(self, status, turns):
         """Adds status to a character"""
-        for st in statuses:
+        for st in combat.statuses:
             if st['name'] == status:
                 temp = st.copy()
                 temp['count'] = turns
@@ -157,21 +102,21 @@ class GB(Enemy):
     def attack(self, target: "Character"):
         n = random.randint(1, 100)
         if n < 50:
-            if accuracy(50, self, target) == True:
+            if combat.accuracy(50, self, target) == True:
                 print(f"{self.name} used Bash on {target.name}!")
                 damage = 10
                 if target.has_status('Infiltrated'):
-                    damage = infiltrated(damage)
+                    damage = combat.infiltrated(damage)
                 target.take_damage(damage)
                 print(f'{target.name} took {damage} damage.')
             else:
                 print('The attack missed!')
         else:
-            if accuracy(50, self, target) == True:
+            if combat.accuracy(50, self, target) == True:
                 print(f"{self.name} used Ram on {target.name}!")
                 damage = 15
                 if target.has_status('Infiltrated'):
-                    damage = infiltrated(damage)
+                    damage = combat.infiltrated(damage)
                 target.take_damage(damage)
                 print(f'{target.name} took {damage} damage.')
             else:
@@ -179,7 +124,7 @@ class GB(Enemy):
         print('\n')
 
 
-class BB:
+class BB(Enemy):
     """Basic common enemy found roaming the rooms."""
     def __init__(self, status=None, health=75):
         super().__init__('Balloon Boy', health, status)
@@ -187,21 +132,21 @@ class BB:
     def attack(self, target: "Character"):
         n = random.randint(1, 100)
         if n < 50:
-            if accuracy(50, self, target) == True:
+            if combat.accuracy(50, self, target) == True:
                 print(f"{self.name} used Twirl on {target.name}!")
                 damage = 10
                 if target.has_status('Infiltrated'):
-                    damage = infiltrated(damage)
+                    damage = combat.infiltrated(damage)
                 target.take_damage(damage)
                 print(f'{target.name} took {damage} damage.')
             else:
                 print('The attack missed!')
         else:
-            if accuracy(50, self, target) == True:
+            if combat.accuracy(50, self, target) == True:
                 print(f"{self.name} used Balloon Entanglement on {target.name}!")
                 damage = 20
                 if target.has_status('Infiltrated'):
-                    damage = infiltrated(damage)
+                    damage = combat.infiltrated(damage)
                 target.take_damage(damage)
                 print(f'{target.name} took {damage} damage.')
             else:
@@ -241,25 +186,25 @@ class Springtrap(Enemy):
             self.add_status('Phantom', 1)
             damage = 7
             if target.has_status('Infiltrated'):
-                damage = infiltrated(damage)            
+                damage = combat.infiltrated(damage)            
             target.take_damage(damage)
             print(f'{target.name} took {damage} damage.')
         if n == '2':
-            if accuracy(40, self, target) == True:
+            if combat.accuracy(40, self, target) == True:
                 print(f'{self.name} used Decaying Grasp on {target.name}!')
                 damage = 30
                 if target.has_status('Infiltrated'):
-                    damage = infiltrated(damage)
+                    damage = combat.infiltrated(damage)
                 target.take_damage(damage)
                 print(f'{target.name} took {damage} damage.')
             else:
                 print('The attack missed!')
         if n == '3':
-            if accuracy(15, self, target) == True:
+            if combat.accuracy(15, self, target) == True:
                 print(f'{self.name} used Eternal Torment on {target.name}!')
                 damage = 60
                 if target.has_status('Infiltrated'):
-                    damage = infiltrated(damage)
+                    damage = combat.infiltrated(damage)
                 target.take_damage(damage)
                 print(f'{target.name} took {damage} damage.')
             else:
@@ -305,10 +250,10 @@ class Glitchtrap(Enemy):
         n = random.randint(1, 100)
         if n > 30 and n < 60: #28% chance to use this attack
             print(f'{self.name} used Corrupt on {target.name}!')
-            if accuracy(50, self, target) == True:   
+            if combat.accuracy(50, self, target) == True:   
                 damage = 20
                 if target.has_status('Infiltrated'):
-                    damage = infiltrated(damage)
+                    damage = combat.infiltrated(damage)
                 target.take_damage(damage)
                 print(f"{target.name} took {damage} damage!")
                 target.add_status('Corrupted', 1)
@@ -317,27 +262,27 @@ class Glitchtrap(Enemy):
                 print('The attack missed!')
         if n > 15 and n < 31: #17% chance to use this attack
             print(f'{self.name} used Digital Infiltration on {target.name}!')
-            if accuracy(30, self, target) == True:
+            if combat.accuracy(30, self, target) == True:
                 target.add_status('infiltrated', 1)
                 print(f"{self.name} infiltrated {target.name}'s system!")
             else:
                 print('The attack missed!')
         if n >= 2 and n < 16: #14% chance to use this attack
             print(f'{self.name} used System Overload on {target.name}!')
-            if accuracy(40, self, target) == True:
+            if combat.accuracy(40, self, target) == True:
                 damage = 40
                 if target.has_status('Infiltrated'):
-                    damage = infiltrated(damage)
+                    damage = combat.infiltrated(damage)
                 target.take_damage(self.damage) 
                 print(f"{target.name} took {damage} damage!")
             else:
                 print('The attack missed!')
         if n >= 60: #40% chance to use this attack
             print(f'{self.name} used Pixel Blast on {target.name}!')
-            if accuracy(70, self, target) == True:
+            if combat.accuracy(70, self, target) == True:
                 damage = 15
                 if target.has_status('Infiltrated'):
-                    damage = infiltrated(damage)
+                    damage = combat.infiltrated(damage)
                 target.take_damage(self.damage)
                 print(f"{target.name} took {damage} damage!")
             else:

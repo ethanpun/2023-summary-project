@@ -1,6 +1,8 @@
+import json
 import random
 import time
-import json 
+
+import enemies
 
 #Inventory and Items
 with open("items.json", "r") as f:
@@ -58,7 +60,7 @@ class Room:
         ref_next_rooms = ['self.up', 'self.down', 'self.left', 'self.right']
         i = 0
         for _ in range(len(next_rooms)):
-            if next_rooms[i] != None:
+            if next_rooms[i] is not None:
                 next_rooms.pop(i)
                 ref_next_rooms.pop(i)
                 i -= 1
@@ -179,16 +181,16 @@ class Grid:
             while i < 5:
                 tile_x_coord = random.randint(0, 4)
                 tile_y_coord = random.randint(0, 4)
-                if self.grid[tile_x_coord][tile_y_coord] == None:
+                if self.grid[tile_x_coord][tile_y_coord] is None:
                     enemy_count = random.randint(1, 3)
                     enemy_list = []
-                    all_enemies = [GB(),BB()]
+                    all_enemies = [enemies.GB(),enemies.BB()]
                     for _ in range(enemy_count):
                         enemy = random.randint(1, len(all_enemies))
                         if enemy == 1:
-                            enemy_list.append(GB())
+                            enemy_list.append(enemies.GB())
                         elif enemy == 2:
-                            enemy_list.append(BB())
+                            enemy_list.append(enemies.BB())
                     self.grid[tile_x_coord][tile_y_coord] = {'type' : 'creature', 'creatures' : enemy_list}
                     i = i + 1
             k = 0
@@ -196,7 +198,7 @@ class Grid:
             while k < 5:
                 tile_x_coord = random.randint(0, 4)
                 tile_y_coord = random.randint(0, 4)
-                if self.grid[tile_x_coord][tile_y_coord] == None:
+                if self.grid[tile_x_coord][tile_y_coord] is None:
                     random_item = random.choice(all_items)
                     self.grid[tile_x_coord][tile_y_coord] = {'type' : 'item', 'item' : random_item}
                     k = k + 1
@@ -227,7 +229,7 @@ class Grid:
         '''
         Return true if user coordinates are currently on a creature tile.
         '''
-        if self.grid[self.get_position()[0]][self.get_position()[1]] == None:
+        if self.grid[self.get_position()[0]][self.get_position()[1]] is None:
             return False
         elif self.grid[self.get_position()[0]][self.get_position()[1]]['type'] == 'creature':
             return True
@@ -243,7 +245,7 @@ class Grid:
         '''
         Return true if user coordinates are currently on a item tile.
         '''
-        if self.grid[self.get_position()[0]][self.get_position()[1]] == None:
+        if self.grid[self.get_position()[0]][self.get_position()[1]] is None:
             return False
         elif self.grid[self.get_position()[0]][self.get_position()[1]]['type'] == 'item':
             return True

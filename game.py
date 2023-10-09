@@ -1,12 +1,15 @@
 import random
-import data
 import time
+
+import characters
+import data
+import enemies
 
 class MUDGame:
 
     def __init__(self):
         # self.spawn = Room('home', up='closed')
-        self.boss = data.Springtrap()
+        self.boss = enemies.Springtrap()
         self.current_room = data.start_room()
         self.gameOver = False
         self.player1 = None
@@ -38,13 +41,13 @@ class MUDGame:
                 )
                 character = data.choose_character(player)
             if character == 'freddy' or character == 'freddy fazbear':
-                self.set_player(player, data.Freddy())
+                self.set_player(player, characters.Freddy())
             elif character == 'bonnie':
-                self.set_player(player, data.Bonnie())
+                self.set_player(player, characters.Bonnie())
             elif character == 'chica':
-                self.set_player(player, data.Chica())
+                self.set_player(player, characters.Chica())
             elif character == 'foxy':
-                self.set_player(player, data.Foxy())
+                self.set_player(player, characters.Foxy())
             elif character == 'skip':
                 break
         print('The game will begin.\n')
@@ -138,7 +141,7 @@ class MUDGame:
                 player_list = [player for player in player_list if player != None]
                 k = 0                        
                 target = None
-                while not data.is_defeat(player_list) and not data.is_victory(enemy_list):
+                while not characters.is_defeat(player_list) and not characters.is_victory(enemy_list):
                     active_character = turn_order[(k % len(turn_order))]
                     if active_character.has_status('Sleeping'):
                         print(f"{active_character.name} is asleep.")
@@ -231,11 +234,11 @@ class MUDGame:
                     #Reduce count of status effects
                     active_character.remove_status()
                     #Check if victory or defeat
-                    if data.is_defeat(player_list):
+                    if characters.is_defeat(player_list):
                         self.gameOver = True
                         print("Party defeated. Looks like you'll forgotten, just like the other animatronics down here who met their demise.")
                         break
-                    elif data.is_victory(enemy_list):
+                    elif characters.is_victory(enemy_list):
                         print('Encounter survived.')
                         self.current_room.grid.clear_tile()
                         break
@@ -268,7 +271,7 @@ class MUDGame:
                 enemy_list = [self.boss]
                 k = 0                        
                 target = None
-                while not data.is_defeat(player_list) and not data.is_victory(
+                while not characters.is_defeat(player_list) and not characters.is_victory(
                         enemy_list):
                     active_character = turn_order[(k % len(turn_order))]
                     if active_character.has_status('Sleeping'):
@@ -362,20 +365,20 @@ class MUDGame:
                     #Reduce count of status effects
                     active_character.remove_status()
                     #Check if victory or defeat
-                    if data.is_defeat(player_list):
+                    if characters.is_defeat(player_list):
                         self.gameOver = True
                         print("Party defeated. Looks like you'll forgotten, just like the other animatronics down here who met their demise.")
                         break
-                    elif data.is_victory(
+                    elif characters.is_victory(
                             enemy_list) and self.boss.name == 'Springtrap':
                         #Initiate phase 2
-                        self.boss = data.Glitchtrap()
+                        self.boss = enemies.Glitchtrap()
                         self.boss.spawn()
                         enemy_list = [self.boss]
                         turn_order.insert(1, enemy_list[0])
                         k = 0
                         continue
-                    elif data.is_victory(
+                    elif characters.is_victory(
                             enemy_list) and self.boss.name == 'Glitchtrap':
                         self.gameOver = True
                         data.Ending()

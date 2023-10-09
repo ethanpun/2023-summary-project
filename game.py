@@ -43,13 +43,13 @@ class MUDGame:
                 )
                 character = data.choose_character(player)
             if character == 'freddy' or character == 'freddy fazbear':
-                self.set_player(player, characters.Freddy(inventory=common_inventory))
+                self.set_player(player, characters.Freddy(health=100, inventory=common_inventory))
             elif character == 'bonnie':
-                self.set_player(player, characters.Bonnie(inventory=common_inventory))
+                self.set_player(player, characters.Bonnie(health=100, inventory=common_inventory))
             elif character == 'chica':
-                self.set_player(player, characters.Chica(inventory=common_inventory))
+                self.set_player(player, characters.Chica(health=100, inventory=common_inventory))
             elif character == 'foxy':
-                self.set_player(player, characters.Foxy(inventory=common_inventory))
+                self.set_player(player, characters.Foxy(health=100, inventory=common_inventory))
             elif character == 'skip':
                 break
         print('The game will begin.\n')

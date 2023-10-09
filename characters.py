@@ -53,10 +53,15 @@ class Character:
     get_stats(str): Displays a character's stats
      
     """
-    def __init__(self, name, status=None, health=100, inventory=None):
+    def __init__(self,
+                 name: str,
+                 health: int,
+                 attacks: list["Attack"],
+                 inventory: data.Inventory):
         self.name = name
         self.health = health
-        self.status = status if status is not None else []
+        self.attacks = attacks
+        self.status = []
         self.item_equipped = None
         self.inventory = inventory
 
@@ -234,11 +239,11 @@ class Freddy(Character):
     attack(str): Attacks a target using one of its attacks
     passive(str): Increases damage if target is asleep  
     """
-    def __init__(self, status=None, health=100, inventory=None):
-        self.name = 'Freddy Fazbear'
-        self.health = health
-        self.status = status if status is not None else []
-        self.item_equipped = None
+    def __init__(self,
+                 health: int,
+                 attacks: list["Attack"],
+                 inventory: data.Inventory):
+        super().__init__('Freddy Fazbear', health, [], inventory)
         
     def prompt_attack(self):
         """
@@ -310,11 +315,11 @@ class Bonnie(Character):
     attack(str): Attacks a target using one of its attacks
     passive(str): Increases damage by a multiplier of 1 to 10 if target has resonance
     """
-    def __init__(self, status=None, health=100, inventory=None):
-        self.name = 'Bonnie'
-        self.health = health
-        self.status = status if status is not None else []
-        self.item_equipped = None
+    def __init__(self,
+                 health: int,
+                 attacks: list["Attack"],
+                 inventory: data.Inventory):
+        super().__init__('Bonnie', health, [], inventory)
         
     def prompt_attack(self):
         """
@@ -394,11 +399,11 @@ class Foxy(Character):
     attack(str): Attacks a target using one of its attacks
     passive(str): Increases damage by 30% if Foxy has less than half health
     """
-    def __init__(self, status=None, health=100, inventory=None):
-        self.name = 'Foxy'
-        self.health = health
-        self.status = status if status is not None else []
-        self.item_equipped = None
+    def __init__(self,
+                 health: int,
+                 attacks: list["Attack"],
+                 inventory: data.Inventory):
+        super().__init__('Foxy', health, [], inventory)
         
     def prompt_attack(self):
         print(f"{self.name}'s attacks:'")
@@ -475,12 +480,12 @@ class Chica(Character):
     attack(str): Attacks a target using one of its attacks
     passive(str): If cupcake is present, heals Chica for 10 each turn. When cupcake is destroyed, deals 20 damage to targetted opponent
     """
-    def __init__(self, status=None, health=100, inventory=None, cupcake=None):
-        self.name = 'Chica'
-        self.health = health
-        self.status = status if status is not None else []
-        self.item_equipped = None
-        self.cupcake = cupcake
+    def __init__(self,
+                 health: int,
+                 attacks: list["Attack"],
+                 inventory: data.Inventory):
+        super().__init__('Chica', health, [], inventory)
+        self.cupcake = None
         
     def prompt_attack(self):
         """

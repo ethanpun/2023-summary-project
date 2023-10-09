@@ -39,8 +39,6 @@ with open("items.json", "r") as f:
     for record in json.load(f):
         all_items.append(Item(**record))
 
-breakpoint()
-
 
 class Inventory:
     """Class with methods for managing inventory.

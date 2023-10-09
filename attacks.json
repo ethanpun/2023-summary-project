@@ -1,0 +1,103 @@
+[
+    {
+        "name": "Mic Toss",
+        "accuracy": 90,
+        "damage": 15
+    },
+    {
+        "name": "Sing",
+        "accuracy": 40,
+        "damage": null,
+        "inflicts": "Sleeping"
+    },
+    {
+        "name": "The Bite",
+        "accuracy": 19,
+        "damage": 87
+    },
+    {
+        "name": "Rift",
+        "accuracy": 90,
+        "damage": 15
+    },
+    {
+        "name": "Guitar Crash",
+        "accuracy": 40,
+        "damage": 10,
+        "inflicts": "Resonance"
+    },
+    {
+        "name": "Rock 'n' Roll",
+        "accuracy": 25,
+        "damage": "25*n, n ranges from 1 to 5"
+    },
+    {
+        "name": "Yar-Har",
+        "accuracy": 90,
+        "damage": 15
+    },
+    {
+        "name": "Harvest Moon",
+        "accuracy": null,
+        "damage": null,
+        "inflicts": "Nightfall"
+    },
+    {
+        "name": "Death Grip",
+        "accuracy": 25,
+        "damage": 125
+    },
+    {
+        "name": "Pizza Slice",
+        "accuracy": 90,
+        "damage": 15
+    },
+    {
+        "name": "Cupcake Decoy",
+        "accuracy": null,
+        "damage": null
+    },
+    {
+        "name": "Devour",
+        "accuracy": 69,
+        "damage": 30
+    },
+    {
+        "name": "Phantom Mirage",
+        "accuracy": null,
+        "damage": 7,
+        "inflicts": "Phantom"
+    },
+    {
+        "name": "Decaying Grasp",
+        "accuracy": 40,
+        "damage": 30
+    },
+    {
+        "name": "Eternal Torment",
+        "accuracy": 15,
+        "damage": 60
+    },
+    {
+        "name": "Corrupt",
+        "accuracy": 50,
+        "damage": 20,
+        "inflicts": "Corrupted"
+    },
+    {
+        "name": "Digital Infiltration",
+        "accuracy": 30,
+        "damage": null,
+        "inflicts": "Infiltrated"
+    },
+    {
+        "name": "System Overload",
+        "accuracy": 40,
+        "damage": 40
+    },
+    {
+        "name": "Pixel Blast",
+        "accuracy": 70,
+        "damage": 15
+    }
+]

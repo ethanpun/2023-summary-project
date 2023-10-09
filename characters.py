@@ -67,11 +67,7 @@ class Character:
             print("You don't have any items currently.")
         else:
             for item in self.inventory.items():
-                name = item['name']
-                description = item['description']
-                effect = item['effect']
-                consumable = item['consumable']
-                print(f'Item : {name}  /\t Description : {description}  /\t Effect : {effect}  /\t Consumable : {consumable}')
+                print(f'Item : {item.name}  /\t Description : {item.description}  /\t Effect : {item.effect}  /\t Consumable : {item.consumable}')
 
     def add_item(self, item: data.Item):
         """Adds items collected into the player's inventory"""
@@ -91,26 +87,26 @@ class Character:
         elif is_use == 'y':
             return True
 
-    def use_item(self, item):
+    def use_item(self, name: str):
         """Uses a selected item in the player's inventory"""
-        for it in self.inventory.items():
-            if it['name'] == item:
-                if not it['consumable']:  # If item can't be consumed
+        for item in self.inventory.items():
+            if item.name == item:
+                if not item.consumable:  # If item can't be consumed
                     print("You can't consume this item.")
                     return False
-                if it['type'] == 'healing':  # If item is healing
-                    self.heal(it['heal'])
-                    self.inventory.remove_item(it)
+                if item.type == 'healing':  # If item is healing
+                    self.heal(item.heal)
+                    self.inventory.remove_item(item)
                     return True
-                elif it['type'] == 'weapon':  # If item is weapon
+                elif item.type == 'weapon':  # If item is weapon
                     if self.items_equipped != None:
                         print('You already have a weapon equipped.')
                         return False
                     else:
-                        self.items_equipped.append(it)
-                        name = it['name']
+                        self.items_equipped.append(item)
+                        name = item.name
                         print(f'{self.name} has equipped {name}.')
-                        self.inventory.remove_item(it)
+                        self.inventory.remove_item(item)
                         return True
         print("You don't have this item.")
         return False
@@ -177,7 +173,7 @@ class Character:
         damage = 0
         damage += self.passive(target)
         if self.item_equipped != None:
-            damage += self.item_equipped['damage']
+            damage += self.item_equipped.damage
         if atk == '1':
             print(f'Freddy used Mic Toss on {target.name}!')
             if combat.accuracy(90, self, target) == True:
@@ -288,7 +284,7 @@ class Freddy(Character):
         damage = 0
         damage += self.passive(target)
         if self.item_equipped != None:
-            damage += self.item_equipped['damage']
+            damage += self.item_equipped.damage
         if atk == '1':
             print(f'Freddy used Mic Toss on {target.name}!')
             if combat.accuracy(90, self, target) == True:
@@ -364,7 +360,7 @@ class Bonnie(Character):
         damage = 0
         damage += self.passive(target)
         if self.item_equipped != None:
-            damage += self.item_equipped['damage']
+            damage += self.item_equipped.damage
         if atk == '1':
             print(f'{self.name} used Rift on {target.name}!')
             if combat.accuracy(90, self, target) == True:
@@ -444,7 +440,7 @@ class Foxy(Character):
         """
         damage = 0
         if self.item_equipped != None:
-            damage += self.item_equipped['damage']
+            damage += self.item_equipped.damage
         if atk == '1':
             print(f'{self.name} used Yar-Har on {target.name}!')
             if combat.accuracy(90, self, target) == True:
@@ -530,7 +526,7 @@ class Chica(Character):
         damage = 0
         self.passive(target)
         if self.item_equipped != None:
-            damage += self.item_equipped['damage']
+            damage += self.item_equipped.damage
         if atk == '1':
             print(f'{self.name} used Pizza slice on {target.name}!')
             if combat.accuracy(90, self, target) == True:

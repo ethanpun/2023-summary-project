@@ -31,3 +31,7 @@ with open("attacks.json", "r") as f:
         record["name"]: Attack(**record)
         for record in json.load(f)
     }
+
+def get(name: str) -> Attack:
+    """Returns an attack by name"""
+    return all_attacks[name]

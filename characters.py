@@ -1,5 +1,6 @@
 import random
 
+import attacks
 import combat
 import data
 
@@ -241,9 +242,17 @@ class Freddy(Character):
     """
     def __init__(self,
                  health: int,
-                 attacks: list["Attack"],
                  inventory: data.Inventory):
-        super().__init__('Freddy Fazbear', health, [], inventory)
+        super().__init__(
+            'Freddy Fazbear',
+            health,
+            [
+                attacks.get("Mic Toss"),
+                attacks.get("Sing"),
+                attacks.get("The Bite"),
+            ],
+            inventory
+        )
         
     def prompt_attack(self):
         """
@@ -317,9 +326,17 @@ class Bonnie(Character):
     """
     def __init__(self,
                  health: int,
-                 attacks: list["Attack"],
                  inventory: data.Inventory):
-        super().__init__('Bonnie', health, [], inventory)
+        super().__init__(
+            'Bonnie',
+            health,
+            [
+                attacks.get("Rift"),
+                attacks.get("Guitar Crash"),
+                attacks.get("Rock 'n' Roll"),
+            ],
+            inventory
+        )
         
     def prompt_attack(self):
         """
@@ -401,9 +418,17 @@ class Foxy(Character):
     """
     def __init__(self,
                  health: int,
-                 attacks: list["Attack"],
                  inventory: data.Inventory):
-        super().__init__('Foxy', health, [], inventory)
+        super().__init__(
+            'Foxy',
+            health,
+            [
+                attacks.get("Yar-Har"),
+                attacks.get("Harvest Moon"),
+                attacks.get("Death Grip"),
+            ],
+            inventory
+        )
         
     def prompt_attack(self):
         print(f"{self.name}'s attacks:'")
@@ -482,9 +507,17 @@ class Chica(Character):
     """
     def __init__(self,
                  health: int,
-                 attacks: list["Attack"],
                  inventory: data.Inventory):
-        super().__init__('Chica', health, [], inventory)
+        super().__init__(
+            'Chica',
+            health,
+            [
+                attacks.get("Pizza Slice"),
+                attacks.get("Cupcake Decoy"),
+                attacks.get("Devour"),
+            ],
+            inventory
+        )
         self.cupcake = None
         
     def prompt_attack(self):

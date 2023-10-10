@@ -1,6 +1,7 @@
 import random
 import time
 
+import attacks
 import combat
 
 
@@ -23,10 +24,15 @@ class Enemy:
     attack(str): Attacks a target using one of its attacks 
     """
 
-    def __init__(self, name: str, health, status=None):
+    def __init__(self,
+                 name: str,
+                 health: int,
+                 attacks: list["Attack"],
+                 status=None):
         self.name = name
         self.health = health
         self.max_health = health
+        self.attacks = attacks
         self.status = status if status is not None else []
 
     def take_damage(self, damage: int):
@@ -97,7 +103,7 @@ class GB(Enemy):
     """Basic common enemy found roaming the rooms."""
 
     def __init__(self, status=None, health=50):
-        super().__init__('Glitch Bunny', health, status)
+        super().__init__('Glitch Bunny', health, [], status)
 
     def attack(self, target: "Character"):
         n = random.randint(1, 100)
@@ -127,7 +133,7 @@ class GB(Enemy):
 class BB(Enemy):
     """Basic common enemy found roaming the rooms."""
     def __init__(self, status=None, health=75):
-        super().__init__('Balloon Boy', health, status)
+        super().__init__('Balloon Boy', health, [], status)
 
     def attack(self, target: "Character"):
         n = random.randint(1, 100)
@@ -161,7 +167,16 @@ class Springtrap(Enemy):
     encounter(): Displays dialogue when encountering Springtrap
     """
     def __init__(self, status=None, health=250):
-        super().__init__('Springtrap', health, status)
+        super().__init__(
+            'Springtrap',
+            health,
+            [
+                attacks.get("Phantom Mirage"),
+                attacks.get("Decaying Grasp"),
+                attacks.get("Eternal Torment"),
+            ]
+            status
+        )
 
     def encounter(self):
         """
@@ -220,7 +235,16 @@ class Glitchtrap(Enemy):
     """
 
     def __init__(self, status=None, health=275):
-        super().__init__('Glitchtrap', health, status)
+        super().__init__(
+            'Glitchtrap',
+            health,
+            [
+                attacks.get("Corrupt"),
+                attacks.get("Digital Infiltration"),
+                attacks.get("System Overload"),
+                attacks.get("Pixel Blast"),
+            ]
+            status)
 
     def spawn():
         """

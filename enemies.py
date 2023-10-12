@@ -27,7 +27,7 @@ class Enemy:
     def __init__(self,
                  name: str,
                  health: int,
-                 attacks: list["Attack"],
+                 attacks: list[attacks.Attack],
                  status=None):
         self.name = name
         self.health = health
@@ -103,7 +103,15 @@ class GB(Enemy):
     """Basic common enemy found roaming the rooms."""
 
     def __init__(self, status=None, health=50):
-        super().__init__('Glitch Bunny', health, [], status)
+        super().__init__(
+            'Glitch Bunny',
+            health,
+            [
+                attacks.get("Bash"),
+                attacks.get("Ram"),
+            ],
+            status
+        )
 
     def attack(self, target: "Character"):
         n = random.randint(1, 100)
@@ -133,7 +141,15 @@ class GB(Enemy):
 class BB(Enemy):
     """Basic common enemy found roaming the rooms."""
     def __init__(self, status=None, health=75):
-        super().__init__('Balloon Boy', health, [], status)
+        super().__init__(
+            'Balloon Boy',
+            health,
+            [
+                attacks.get("Twirl"),
+                attacks.get("Balloon Entanglement"),
+            ],
+            status
+        )
 
     def attack(self, target: "Character"):
         n = random.randint(1, 100)
@@ -174,7 +190,7 @@ class Springtrap(Enemy):
                 attacks.get("Phantom Mirage"),
                 attacks.get("Decaying Grasp"),
                 attacks.get("Eternal Torment"),
-            ]
+            ],
             status
         )
 

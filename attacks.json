@@ -65,6 +65,26 @@
         "damage": 30
     },
     {
+        "name": "Bash",
+        "accuracy": 50,
+        "damage": 10
+    },
+    {
+        "name": "Ram",
+        "accuracy": 50,
+        "damage": 15
+    },
+    {
+        "name": "Twirl",
+        "accuracy": 50,
+        "damage": 10
+    },
+    {
+        "name": "Balloon Entanglement",
+        "accuracy": 50,
+        "damage": 20
+    },
+    {
         "name": "Phantom Mirage",
         "accuracy": null,
         "damage": 7,

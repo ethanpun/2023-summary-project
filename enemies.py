@@ -14,6 +14,7 @@ class Enemy:
     health (int): Max health of enemy
 
     Methods:
+    attack(character)
     take_damage(x): Reduces health of character by x 
     is_defeated(): Returns True if characters health is less than 0, else return False
     display_turn(): Displays the characters turn
@@ -94,9 +95,21 @@ class Enemy:
 
     def attack(self, target: "Character"):
         """Attacks a target using one of its attacks.
-        Subclasses must implement this method.
         """
-        raise NotImplementedError
+        attack = random.choice(self.attacks)
+        if not attack:
+            print(f"{self.name} has no attacks available!")
+            return
+        if combat.accuracy(attack.accuracy, self, target):
+            print(f"{self.name} used {attack.name} on {target.name}!")
+            damage = attack.damage
+            if target.has_status('Infiltrated'):
+                damage = combat.infiltrated(damage)
+            target.take_damage(damage)
+            print(f'{target.name} took {damage} damage.')
+        else:
+            print('The attack missed!')
+        print('\n')
 
 
 class GB(Enemy):
@@ -113,30 +126,6 @@ class GB(Enemy):
             status
         )
 
-    def attack(self, target: "Character"):
-        n = random.randint(1, 100)
-        if n < 50:
-            if combat.accuracy(50, self, target) == True:
-                print(f"{self.name} used Bash on {target.name}!")
-                damage = 10
-                if target.has_status('Infiltrated'):
-                    damage = combat.infiltrated(damage)
-                target.take_damage(damage)
-                print(f'{target.name} took {damage} damage.')
-            else:
-                print('The attack missed!')
-        else:
-            if combat.accuracy(50, self, target) == True:
-                print(f"{self.name} used Ram on {target.name}!")
-                damage = 15
-                if target.has_status('Infiltrated'):
-                    damage = combat.infiltrated(damage)
-                target.take_damage(damage)
-                print(f'{target.name} took {damage} damage.')
-            else:
-                print('The attack missed!')
-        print('\n')
-
 
 class BB(Enemy):
     """Basic common enemy found roaming the rooms."""
@@ -150,22 +139,6 @@ class BB(Enemy):
             ],
             status
         )
-
-    def attack(self, target: "Character"):
-        attack = random.choice(self.attacks)
-        if not attack:
-            print(f"{self.name} has no attacks available!")
-            return
-        if combat.accuracy(attack.accuracy, self, target):
-            print(f"{self.name} used {attack.name} on {target.name}!")
-            damage = attack.damage
-            if target.has_status('Infiltrated'):
-                damage = combat.infiltrated(damage)
-            target.take_damage(damage)
-            print(f'{target.name} took {damage} damage.')
-        else:
-            print('The attack missed!')
-        print('\n')
 
 
 class Springtrap(Enemy):

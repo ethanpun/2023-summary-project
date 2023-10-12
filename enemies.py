@@ -152,11 +152,10 @@ class BB(Enemy):
         )
 
     def attack(self, target: "Character"):
-        n = random.randint(1, 100)
-        if n < 50:
-            attack = self.attacks[0]
-        else:
-            attack = self.attacks[1]
+        attack = random.choice(self.attacks)
+        if not attack:
+            print(f"{self.name} has no attacks available!")
+            return
         if combat.accuracy(attack.accuracy, self, target):
             print(f"{self.name} used {attack.name} on {target.name}!")
             damage = attack.damage

@@ -154,25 +154,18 @@ class BB(Enemy):
     def attack(self, target: "Character"):
         n = random.randint(1, 100)
         if n < 50:
-            if combat.accuracy(50, self, target) == True:
-                print(f"{self.name} used Twirl on {target.name}!")
-                damage = 10
-                if target.has_status('Infiltrated'):
-                    damage = combat.infiltrated(damage)
-                target.take_damage(damage)
-                print(f'{target.name} took {damage} damage.')
-            else:
-                print('The attack missed!')
+            attack = self.attacks[0]
         else:
-            if combat.accuracy(50, self, target) == True:
-                print(f"{self.name} used Balloon Entanglement on {target.name}!")
-                damage = 20
-                if target.has_status('Infiltrated'):
-                    damage = combat.infiltrated(damage)
-                target.take_damage(damage)
-                print(f'{target.name} took {damage} damage.')
-            else:
-                print('The attack missed!')
+            attack = self.attacks[1]
+        if combat.accuracy(attack.accuracy, self, target):
+            print(f"{self.name} used {attack.name} on {target.name}!")
+            damage = attack.damage
+            if target.has_status('Infiltrated'):
+                damage = combat.infiltrated(damage)
+            target.take_damage(damage)
+            print(f'{target.name} took {damage} damage.')
+        else:
+            print('The attack missed!')
         print('\n')
 
 

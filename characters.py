@@ -42,7 +42,6 @@ class Character:
     take_damage(x): Reduces health of character by x 
     is_defeated(): Returns True if character's health is less than 0, else return False
     display_turn(): Displays the character's turn
-    prompt_action(str): Prompts the user for an action
     prompt_check(str): Allows user to check the stats of party or enemy
     prompt_attack(): Prompts the user to choose an attack to use
     attack(str): Attacks a target using one of its attacks
@@ -135,18 +134,6 @@ class Character:
         """Displays the character's turn"""
         print('--------------------------------------------------------')
         print(f"It is {self.name}'s turn.\n")
-
-    def prompt_action(self):
-        """Prompts the user for an action"""
-        print('Select one of the following actions:')
-        print('1. Attack')
-        print('2. Target')
-        print('3. Stats')
-        print('4. Item')
-        dec = input('Please choose an action: ')
-        print('')
-        dec = dec.lower()
-        return dec
 
     def prompt_check(self):
         """Allows user to check the stats of party or enemy"""

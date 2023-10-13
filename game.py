@@ -6,6 +6,10 @@ import data
 import enemies
 import text
 
+
+ACTIONS = ["Attack", "Target", "Stats", "Item"]
+
+
 class MUDGame:
 
     def __init__(self):
@@ -159,10 +163,12 @@ class MUDGame:
                         active_character.attack(target)
                         target = None
                     elif active_character in player_list:
-                        action = active_character.prompt_action()
-                        while action not in ['attack', 'target', 'stats', 'item', '1', '2' ,'3', '4']:
-                            print(f'Select a valid action. Got {action}')
-                            action = active_character.prompt_action()
+                        action = text.prompt_valid_choice(
+                            ACTIONS,
+                            prompt='Please choose an action',
+                            errmsg='Select a valid action.',
+                            prelude='Select one of the following actions:'
+                        )
                         if active_character.has_status('Corrupted'):
                             target = random.choice(turn_order)
                             active_character.attack(target, '1')
@@ -291,10 +297,12 @@ class MUDGame:
                         active_character.attack(target)
                         target = None
                     elif active_character in player_list:
-                        action = active_character.prompt_action()
-                        while action not in ['attack', 'target', 'stats', 'item', '1', '2' ,'3', '4']:
-                            print(f'Select a valid action. Got {action}')
-                            action = active_character.prompt_action()
+                        action = text.prompt_valid_choice(
+                                ACTIONS,
+                                prompt='Please choose an action',
+                                errmsg='Select a valid action.',
+                                prelude='Select one of the following actions:'
+                            )
                         if active_character.has_status('Corrupted'):
                             target = random.choice(turn_order)
                             active_character.attack(target, '1')

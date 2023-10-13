@@ -8,7 +8,11 @@ from typing import Any
 def prompt_valid_choice(
     options: list,
     prompt: str = "Pick an option",
-    errmsg: str = "Invalid option, try again.") -> Any:
+    errmsg: str = "Invalid option, try again.",
+    prelude: str = "",
+) -> Any:
+    if prelude:
+        print(prelude)
     for i, option in enumerate(options, start=1):
         print(f"{i}. {option}")
     print('')

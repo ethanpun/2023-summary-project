@@ -168,19 +168,51 @@ class Character:
         print('')
         return check.lower()
 
-    def prompt_attack(self):
-        """Prompts the user to choose an attack to use.
-        Subclasses must implement this method.
-        """
-        raise NotImplementedError
+    def prompt_attack(self) -> str:
+        """Prompts the user to choose an attack to use"""
+        print(f"{self.name}'s Attacks:'")
+        for i, attack in enumerate(self.attacks, start=1):
+            print(f"{i}. {attack}")
+        print("Type 'back' to cancel the attack. Use the numbers corresponding to each ability to attack.")
+        atk = input("Select an attack to use: ")
+        print('')
+        return atk
 
-    def attack(self, target, atk):
-        """Attacks a target using one of its attacks.
-        Subclasses must implement this method.
-        """
-        raise NotImplementedError
+    def attack(self, target: "Enemy", atk: str):
+        """Attacks a target using one of its attacks"""
+        damage = 0
+        damage += self.passive(target)
+        if self.item_equipped:
+            damage += self.item_equipped.damage
+        assert atk in "123"
+        attack = self.attacks[int(atk) - 1]
+        print(f'{self.name} used {attack.name} on {target.name}!')
+        # If attack has accuracy, determine if attack misses
+        if attack.accuracy and not combat.accuracy(attack.accuracy, self, target):
+            print('The attack missed!')
+            return
+        # Attack hits
+        if attack.damage:
+            if attack.repeats:
+                lower, upper = attack.repeats
+                hits = random.randint(lower, upper)
+                print(f'{target.name} was hit {hits} times!')
+            else:
+                hits = 1
+            damage += attack.damage * hits
+            print(f"{target.name} took {damage} damage!")
+            target.take_damage(damage)
+        if attack.healing:
+            self.heal(attack.healing)
+        if attack.inflicts:
+            status = combat.get_status(attack.inflicts)
+            target.add_status(status.name, status.count)
+            # Dirty hack for Resonance
+            if status.name == "Resonance":
+                print(f"{self.name}'s attack leaves a resonating aura around {target.name}!")
+        print('\n')
 
-    def passive(self, target):
+    def passive(self, target) -> int:
         """Subclasses must implement this method."""
         raise NotImplementedError
 
@@ -236,8 +268,6 @@ class Freddy(Character):
     inventory(list): Shows items collected.
 
     Methods:
-    prompt_attack(): Prompts the user to choose an attack to use
-    attack(str): Attacks a target using one of its attacks
     passive(str): Increases damage if target is asleep  
     """
     def __init__(self,
@@ -253,49 +283,6 @@ class Freddy(Character):
             ],
             inventory
         )
-        
-    def prompt_attack(self) -> str:
-        """Prompts the user to choose an attack to use"""
-        print(f"{self.name}'s Attacks:'")
-        for i, attack in enumerate(self.attacks, start=1):
-            print(f"{i}. {attack}")
-        print("Type 'back' to cancel the attack. Use the numbers corresponding to each ability to attack.")
-        atk = input("Select an attack to use: ")
-        print('')
-        return atk
-
-    def attack(self, target: "Enemy", atk: str):
-        """Attacks a target using one of its attacks"""
-        damage = 0
-        damage += self.passive(target)
-        if self.item_equipped:
-            damage += self.item_equipped.damage
-        assert atk in "123"
-        attack = self.attacks[int(atk) - 1]
-        print(f'Freddy used {attack.name} on {target.name}!')
-        # If attack has accuracy, determine if attack misses
-        if attack.accuracy and not combat.accuracy(attack.accuracy, self, target):
-            print('The attack missed!')
-            return
-        # Attack hits
-        if attack.damage:
-            if attack.repeats:
-                lower, upper = attack.repeats
-                hits = random.randint(lower, upper)
-            else:
-                hits = 1
-            damage += attack.damage * hits
-            print(f"{target.name} took {damage} damage!")
-            target.take_damage(damage)
-        if attack.healing:
-            self.heal(attack.healing)
-        if attack.inflicts:
-            status = combat.get_status(attack.inflicts)
-            target.add_status(status.name, status.count)
-            if status.name == "Resonance":
-                print(f"{self.name}'s attack leaves a resonating aura around {target.name}!")
-        print('\n')
-
             
     def passive(self, target: "Enemy"):
         """Increases damage if target is asleep"""
@@ -303,7 +290,6 @@ class Freddy(Character):
             return 5
         else:
             return 0
-
 
 
 class Bonnie(Character):
@@ -315,8 +301,6 @@ class Bonnie(Character):
     inventory(list): Shows items collected.
 
     Methods:
-    prompt_attack(): Prompts the user to choose an attack to use
-    attack(str): Attacks a target using one of its attacks
     passive(str): Increases damage by a multiplier of 1 to 10 if target has resonance
     """
     def __init__(self,
@@ -332,55 +316,6 @@ class Bonnie(Character):
             ],
             inventory
         )
-        
-    def prompt_attack(self) -> str:
-        """Prompts the user to choose an attack to use"""
-        print(f"{self.name}'s Attacks:'")
-        for i, attack in enumerate(self.attacks, start=1):
-            print(f"{i}. {attack}")
-        print("Type 'back' to cancel the attack. Use the numbers corresponding to each ability to attack.")
-        atk = input("Select an attack to use: ")
-        print('')
-        return atk
-
-    def attack(self, target, atk):
-        """
-        Attacks a target using one of its attacks
-        """
-        damage = 0
-        damage += self.passive(target)
-        if self.item_equipped != None:
-            damage += self.item_equipped.damage
-        if atk == '1':
-            print(f'{self.name} used Rift on {target.name}!')
-            if combat.accuracy(90, self, target) == True:
-                damage += 15
-                print(f"{target.name} took {damage} damage!")
-                target.take_damage(damage)
-            else:
-                print('The attack missed!')
-        if atk == '2':
-            print(f'{self.name} used Guitar Crash on {target.name}!')
-            if combat.accuracy(40, self, target) == True:
-                damage += 10
-                self.heal(10)
-                print(f"{target.name} took {damage} damage!")
-                target.add_status('Resonance', 3)
-                target.take_damage(damage)
-                print(f"{self.name}'s attack leaves a resonating aura around {target.name}!")
-            else:
-                print('The attack missed!')
-        if atk == '3':
-            print(f"{self.name} used Rock 'n' Roll on {target.name}!")
-            if combat.accuracy(40, self, target) == True:
-                hits = random.randint(1, 5)
-                damage += 25*hits
-                print(f'{target.name} was hit {hits} times!')
-                print(f"{target.name} took {damage} damage!")
-                target.take_damage(damage)
-            else:
-                print('The attack missed!')
-        print('\n')
             
     def passive(self, target):
         """

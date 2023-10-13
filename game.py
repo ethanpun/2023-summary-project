@@ -4,6 +4,7 @@ import time
 import characters
 import data
 import enemies
+import text
 
 class MUDGame:
 
@@ -183,10 +184,11 @@ class MUDGame:
                                 active_character.attack(target, skill)
                                 target = None
                         elif action.lower() == 'target' or action == '2':
-                            target = active_character.target(enemy_list)
-                            while not target.isdigit() or int(target) > len(enemy_list):
-                                print(f'Enter a number corresponding to the surviving enemies. Got {target}.')
-                                target = active_character.target()
+                            target = text.prompt_valid_choice(
+                                enemy_list,
+                                prompt='Choose an enemy to target',
+                                errmsg='Enter a number corresponding to the surviving enemies.'
+                            )
                             target = enemy_list[int(target) - 1]
                             continue
                         elif action.lower() == 'check' or action == '3':
@@ -314,10 +316,11 @@ class MUDGame:
                                 active_character.attack(target, skill)
                                 target = None
                         elif action.lower() == 'target' or action == '2':
-                            target = active_character.target(enemy_list)
-                            while not target.isdigit() or int(target) > len(enemy_list):
-                                print(f'Enter a number corresponding to the surviving enemies. Got {target}.')
-                                target = active_character.target()
+                            target = text.prompt_valid_choice(
+                                enemy_list,
+                                prompt='Choose an enemy to target',
+                                errmsg='Enter a number corresponding to the surviving enemies.'
+                            )
                             target = enemy_list[int(target) - 1]
                             continue
                         elif action.lower() == 'check' or action == '3':

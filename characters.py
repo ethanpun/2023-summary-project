@@ -43,7 +43,6 @@ class Character:
     is_defeated(): Returns True if character's health is less than 0, else return False
     display_turn(): Displays the character's turn
     prompt_action(str): Prompts the user for an action
-    target(str): Prompts the user to select a target
     prompt_check(str): Allows user to check the stats of party or enemy
     prompt_attack(): Prompts the user to choose an attack to use
     attack(str): Attacks a target using one of its attacks
@@ -148,18 +147,6 @@ class Character:
         print('')
         dec = dec.lower()
         return dec
-
-    def target(self, enemies):
-        """Prompts the user to select a target"""
-        print('To target enemies, input a number, with the leftmost enemy being 1.')
-        i = 1
-        for enemy in enemies:
-            print(f"{i}. {enemy.name} / HP : {enemy.health}")
-            i += 1
-        print('')
-        target = input('Choose an enemy to target: ')
-        print('')
-        return target
 
     def prompt_check(self):
         """Allows user to check the stats of party or enemy"""

@@ -178,8 +178,10 @@ class Character:
         print('')
         return atk
 
-    def attack(self, target: "Enemy", atk: str):
-        """Attacks a target using one of its attacks"""
+    def attack(self, target: "Enemy", atk: str) -> bool:
+        """Attacks a target using one of its attacks.
+        Returns True if the attack succeeded, otherwise False.
+        """
         damage = 0
         damage += self.passive(target)
         if self.item_equipped:
@@ -190,7 +192,7 @@ class Character:
         # If attack has accuracy, determine if attack misses
         if attack.accuracy and not combat.accuracy(attack.accuracy, self, target):
             print('The attack missed!')
-            return
+            return False
         # Attack hits
         if attack.damage:
             if attack.repeats:
@@ -210,7 +212,11 @@ class Character:
             # Dirty hack for Resonance
             if status.name == "Resonance":
                 print(f"{self.name}'s attack leaves a resonating aura around {target.name}!")
+            # Dirty hack for Harvest Moon
+            if status.name == "Harvest Moon":
+                print(f"{self.name}'s attack and accuracy rose!")
         print('\n')
+        return True
 
     def passive(self, target) -> int:
         """Subclasses must implement this method."""
@@ -356,55 +362,27 @@ class Foxy(Character):
             ],
             inventory
         )
-        
-    def prompt_attack(self) -> str:
-        """Prompts the user to choose an attack to use"""
-        print(f"{self.name}'s Attacks:'")
-        for i, attack in enumerate(self.attacks, start=1):
-            print(f"{i}. {attack}")
-        print("Type 'back' to cancel the attack. Use the numbers corresponding to each ability to attack.")
-        atk = input("Select an attack to use: ")
-        print('')
-        return atk
 
-    def attack(self, target, atk):
+    def attack(self, target, atk) -> bool:
         """
         Prompts the user to choose an attack to use
         """
+        assert atk in "123"
+        attack = self.attacks[int(atk) - 1]
+        success = super().attack(target, atk)
+        if not success:
+            return success
+        if attack.name == "Harvest Moon":
+            return success
         damage = 0
-        if self.item_equipped != None:
-            damage += self.item_equipped.damage
-        if atk == '1':
-            print(f'{self.name} used Yar-Har on {target.name}!')
-            if combat.accuracy(90, self, target) == True:
-                damage += 15
-                damage += self.passive(damage)
-                if self.has_status('Nightfall'):
-                    damage += 15
-                    self.heal(20)
-                    print(f"{self.name} leeched {target.name}'s health!")
-                print(f"{target.name} took {damage} damage!")
-                target.take_damage(damage)
-            else:
-                print('The attack missed!')
-        if atk == '2':
-            print(f'{self.name} used Harvest Moon!')
-            print(f"{self.name}'s attack and accuracy rose!")
-            self.add_status('Nightfall', 5)
-        if atk == '3':
-            print(f"{self.name} used Death Grip on {target.name}!")
-            if combat.accuracy(25, self, target) == True:
-                damage += 125
-                damage += self.passive(damage)
-                if self.has_status('Nightfall'):
-                    damage += 15
-                    self.heal(20)    
-                    print(f"{self.name} leeched {target.name}'s health!")
-                print(f"{target.name} took {damage} damage!")
-                target.take_damage(damage)
-            else:
-                print('The attack missed!')
+        if self.has_status('Nightfall'):
+            damage += 15
+            self.heal(20)
+            print(f"{self.name} leeched {target.name}'s health!")
+            print(f"{target.name} took {damage} damage!")
+            target.take_damage(damage)
         print('\n')
+        return success
             
     def passive(self, damage):
         """
@@ -446,56 +424,42 @@ class Chica(Character):
             inventory
         )
         self.cupcake = None
-        
-    def prompt_attack(self) -> str:
-        """Prompts the user to choose an attack to use"""
-        print(f"{self.name}'s Attacks:'")
-        for i, attack in enumerate(self.attacks, start=1):
-            print(f"{i}. {attack}")
-        print("Type 'back' to cancel the attack. Use the numbers corresponding to each ability to attack.")
-        atk = input("Select an attack to use: ")
-        print('')
-        return atk
 
     def attack(self, target, atk):
         """
         Attacks a target using one of its attacks
         """
-        damage = 0
-        self.passive(target)
-        if self.item_equipped != None:
-            damage += self.item_equipped.damage
-        if atk == '1':
-            print(f'{self.name} used Pizza slice on {target.name}!')
-            if combat.accuracy(90, self, target) == True:
-                damage += 15
-                print(f"{target.name} took {damage} damage!")
-                target.take_damage(damage)
-            else:
-                print('The attack missed!')
-        if atk == '2':
-            if self.cupcake != None:
+        assert atk in "123"
+        attack = self.attacks[int(atk) - 1]
+        if attack.name == "Cupcake Decoy":
+            if self.cupcake:
                 print(f'{self.name} used Cupcake decoy!')
                 print(f'{self.name} placed a cupcake in place of her.')
                 self.cupcake = 50
             else:
                 print('There is already a cupcake in place!')
-        if atk == '3':
-            print(f"{self.name} used Devour on {target.name}!")
-            if combat.accuracy(40, self, target) == True:
-                if self.cupcake > 0:
+            print('\n')
+            return True
+        elif attack.name == "Devour":
+            if combat.accuracy(40, self, target):
+                damage = 0
+                if self.cupcake and self.cupcake > 0:
                     damage += 125
                     print(f"{self.name} devoured the cupcake. Damage Increased.")
                     print(f"{target.name} took {damage} damage!")
                     self.cupcake = 0
-                    
+
                 else:
                     damage += 30
                     print(f"{target.name} took {damage} damage!")
                 target.take_damage(damage)
             else:
                 print('The attack missed!')
-        print('\n')
+                return False
+            print('\n')
+            return True
+        else:
+            return super().attack(target, atk)
 
             
     def passive(self, target):

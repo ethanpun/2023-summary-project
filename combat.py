@@ -23,9 +23,24 @@ def accuracy(accuracy, attacker, target):
         return False
 
 
+class Status:
+    """Encapsulates status data"""
+    def __init__(self, name: str, description: str, count: int):
+        self.name = name
+        self.description = description
+        self.count = count
+
+
 #Status
+statuses = {}
 with open("statuses.json", "r") as f:
-    statuses = json.load(f)
+    for record in json.load(f):
+        # ** operator unpacks dict data into keyword arguments
+        statuses[record["name"]] = Status(**record)
+
+
+def get_status(name: str) -> Status:
+    return statuses[name]
 
 
 def infiltrated(damage):

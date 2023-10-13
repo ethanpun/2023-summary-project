@@ -224,7 +224,7 @@ class Glitchtrap(Enemy):
                 attacks.get("Digital Infiltration"),
                 attacks.get("System Overload"),
                 attacks.get("Pixel Blast"),
-            ]
+            ],
             status)
 
     def spawn():

@@ -24,6 +24,7 @@
         "name": "Guitar Crash",
         "accuracy": 40,
         "damage": 10,
+        "healing": 10,
         "inflicts": "Resonance"
     },
     {

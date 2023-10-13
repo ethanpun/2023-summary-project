@@ -254,56 +254,51 @@ class Freddy(Character):
             inventory
         )
         
-    def prompt_attack(self):
-        """
-        Prompts the user to choose an attack to use
-        """
+    def prompt_attack(self) -> str:
+        """Prompts the user to choose an attack to use"""
         print(f"{self.name}'s Attacks:'")
-        print('1. Mic Toss  90 acc  15 dmg')
-        print('2. Sing  40 acc - dmg')
-        print('3. The Bite  19 acc 87 dmg')
+        for i, attack in enumerate(self.attacks, start=1):
+            print(f"{i}. {attack}")
         print("Type 'back' to cancel the attack. Use the numbers corresponding to each ability to attack.")
         atk = input("Select an attack to use: ")
         print('')
-        return atk.lower()
+        return atk
 
-    def attack(self, target, atk):
-        """
-        Attacks a target using one of its attacks
-        """
+    def attack(self, target: "Enemy", atk: str):
+        """Attacks a target using one of its attacks"""
         damage = 0
         damage += self.passive(target)
-        if self.item_equipped != None:
+        if self.item_equipped:
             damage += self.item_equipped.damage
-        if atk == '1':
-            print(f'Freddy used Mic Toss on {target.name}!')
-            if combat.accuracy(90, self, target) == True:
-                damage += 15
-                print(f"{target.name} took {damage} damage!")
-                target.take_damage(damage)
+        assert atk in "123"
+        attack = self.attacks[int(atk) - 1]
+        print(f'Freddy used {attack.name} on {target.name}!')
+        # If attack has accuracy, determine if attack misses
+        if attack.accuracy and not combat.accuracy(attack.accuracy, self, target):
+            print('The attack missed!')
+            return
+        # Attack hits
+        if attack.damage:
+            if attack.repeats:
+                lower, upper = attack.repeats
+                hits = random.randint(lower, upper)
             else:
-                print('The attack missed!')
-        if atk == '2':
-            print(f'Freddy used Sing on {target.name}!')
-            if combat.accuracy(40, self, target) == True:
-                target.add_status('Sleeping', 2)
-            else:
-                print('The attack missed!')
-        if atk == '3':
-            print(f'Freddy used The Bite on {target.name}!')
-            if combat.accuracy(19, self, target) == True:
-                damage += 87
-                print(f"{target.name} took {damage} damage!")
-                target.take_damage(damage)
-            else:
-                print('The attack missed!')
+                hits = 1
+            damage += attack.damage * hits
+            print(f"{target.name} took {damage} damage!")
+            target.take_damage(damage)
+        if attack.healing:
+            self.heal(attack.healing)
+        if attack.inflicts:
+            status = combat.get_status(attack.inflicts)
+            target.add_status(status.name, status.count)
+            if status.name == "Resonance":
+                print(f"{self.name}'s attack leaves a resonating aura around {target.name}!")
         print('\n')
 
             
-    def passive(self, target):
-        """
-        Increases damage if target is asleep
-        """
+    def passive(self, target: "Enemy"):
+        """Increases damage if target is asleep"""
         if target.has_status('Sleeping'):
             return 5
         else:
@@ -338,18 +333,15 @@ class Bonnie(Character):
             inventory
         )
         
-    def prompt_attack(self):
-        """
-        Prompts the user to choose an attack to use
-        """
-        print(f"{self.name}'s attacks:'")
-        print('1. Rift  90 acc  15 dmg')
-        print('2. Guitar crash  40 acc 10 dmg')
-        print("3. Rock 'n' Roll  25 acc 25*n dmg, n ranges from 1 to 5.")
+    def prompt_attack(self) -> str:
+        """Prompts the user to choose an attack to use"""
+        print(f"{self.name}'s Attacks:'")
+        for i, attack in enumerate(self.attacks, start=1):
+            print(f"{i}. {attack}")
         print("Type 'back' to cancel the attack. Use the numbers corresponding to each ability to attack.")
         atk = input("Select an attack to use: ")
         print('')
-        return atk.lower()
+        return atk
 
     def attack(self, target, atk):
         """
@@ -430,15 +422,15 @@ class Foxy(Character):
             inventory
         )
         
-    def prompt_attack(self):
-        print(f"{self.name}'s attacks:'")
-        print('1. Yar-Har  90 acc  15 dmg')
-        print('2. Harvest Moon  - acc - dmg')
-        print("3. Death Grip  25 acc 125 dmg")
+    def prompt_attack(self) -> str:
+        """Prompts the user to choose an attack to use"""
+        print(f"{self.name}'s Attacks:'")
+        for i, attack in enumerate(self.attacks, start=1):
+            print(f"{i}. {attack}")
         print("Type 'back' to cancel the attack. Use the numbers corresponding to each ability to attack.")
         atk = input("Select an attack to use: ")
         print('')
-        return atk.lower()
+        return atk
 
     def attack(self, target, atk):
         """
@@ -520,18 +512,15 @@ class Chica(Character):
         )
         self.cupcake = None
         
-    def prompt_attack(self):
-        """
-        Prompts the user to choose an attack to use
-        """
-        print(f"{self.name}'s attacks:'")
-        print('1. Pizza slice  90 acc  15 dmg')
-        print('2. Cupcake decoy  - acc - dmg')
-        print("3. Devour  69 acc 30 dmg")
+    def prompt_attack(self) -> str:
+        """Prompts the user to choose an attack to use"""
+        print(f"{self.name}'s Attacks:'")
+        for i, attack in enumerate(self.attacks, start=1):
+            print(f"{i}. {attack}")
         print("Type 'back' to cancel the attack. Use the numbers corresponding to each ability to attack.")
         atk = input("Select an attack to use: ")
         print('')
-        return atk.lower()
+        return atk
 
     def attack(self, target, atk):
         """

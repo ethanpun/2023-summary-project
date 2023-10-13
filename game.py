@@ -114,7 +114,7 @@ class MUDGame:
                 #Picking up items
                 if self.current_room.grid.is_item():
                     item = self.current_room.grid.get_item()
-                    data.add_item(item)
+                     self.player1.add_item(item)
                     self.current_room.grid.clear_tile()
             #Combat Start
             elif self.current_room.grid.is_encounter():

@@ -3,6 +3,7 @@ import random
 import attacks
 import combat
 import data
+import text
 
 
 #Win and lose conditions
@@ -137,20 +138,26 @@ class Character:
 
     def prompt_check(self):
         """Allows user to check the stats of party or enemy"""
-        print("Type 'enemy' to see enemy stats, 'party' to see party stats, 'back' to cancel this action.")
-        check = input("Choose to check enemy or party stats: ")
-        print('')
-        return check.lower()
+        choice = text.prompt_valid_choice(
+            ["Enemy", "Party"],
+            cancel=True,
+            prelude="You can check the following stats:",
+            prompt="Choose stats to check",
+        )
+        if choice == "1":
+            return "enemy"
+        elif choice == "2":
+            return "party"
 
     def prompt_attack(self) -> str:
         """Prompts the user to choose an attack to use"""
-        print(f"{self.name}'s Attacks:'")
-        for i, attack in enumerate(self.attacks, start=1):
-            print(f"{i}. {attack}")
-        print("Type 'back' to cancel the attack. Use the numbers corresponding to each ability to attack.")
-        atk = input("Select an attack to use: ")
-        print('')
-        return atk
+        choice = text.prompt_valid_choice(
+            self.attacks,
+            cancel=True,
+            prelude=f"{self.name}'s Attacks:",
+            prompt="Select an attack to use",
+        )
+        return choice
 
     def attack(self, target: "Enemy", atk: str) -> bool:
         """Attacks a target using one of its attacks.

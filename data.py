@@ -49,23 +49,32 @@ class Inventory:
     remove_item(item) -> bool
     """
     def __init__(self) -> None:
-        pass
+        self._data: list[Item] = []
 
-    def items(self) -> tuple["Item"]:
+    def is_empty(self) -> bool:
+        return len(self._data) == 0
+
+    def items(self) -> tuple["Item", ...]:
         """Returns a tuple of all items in the inventory."""
-        pass
+        return tuple(self._data)
 
     def add_item(self, item: "Item") -> bool:
         """Add an item to inventory.
         Return True if successful, False otherwise.
         """
-        pass
+        assert isinstance(item, Item)
+        self._data.append(item)
+        return True
 
     def remove_item(self, item: "Item") -> bool:
         """Remove an item from inventory.
         Return True if successful, False otherwise.
         """
-        pass
+        assert isinstance(item, Item)
+        if item not in self._data:
+            return False
+        self._data.remove(item)
+        return True
 
 
 #Rooms

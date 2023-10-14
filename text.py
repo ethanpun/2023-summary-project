@@ -13,9 +13,10 @@ def prompt_valid_choice(
     prompt: str = "Pick an option",
     errmsg: str = "Invalid option, try again.",
     prelude: str = "",
-) -> "str | None":
+) -> "int | None":
     """Prompt the user to make a choice from a list of valid choices.
     Display an error message and reprompt until a valid choice is made.
+    Returns the index of the choice made.
 
     Arguments
     ---------
@@ -64,5 +65,5 @@ def prompt_valid_choice(
         if cancel and choice.lower() == 'b':
             return None
     print('')
-    return choice
+    return int(choice) - 1
 

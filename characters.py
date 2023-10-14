@@ -82,15 +82,15 @@ class Character:
 
     def is_use_item(self):
         """Confirms with the player whether they want to use the item"""
-        is_use = input("Use an item? Y/N: ")
-        is_use = is_use.lower()
-        while is_use != 'y' and is_use != 'n':
-            print("Type 'Y' or 'N'.")
-            is_use = input("Use an item? Y/N: ")
-        if is_use == 'n':
-            return False
-        elif is_use == 'y':
-            return True
+        choice = text.prompt_valid_choice(
+            ["Y", "N"],
+            inline=True,
+            prompt="Use an item?",
+        )
+        if choice == 0:
+            return 'y'
+        elif choice == 1:
+            return 'n'
 
     def use_item(self, name: str):
         """Uses a selected item in the player's inventory"""
@@ -144,10 +144,12 @@ class Character:
             prelude="You can check the following stats:",
             prompt="Choose stats to check",
         )
-        if choice == "1":
+        if choice == 0:
             return "enemy"
-        elif choice == "2":
+        elif choice == 1:
             return "party"
+        elif choice is None:
+            return 'back'
 
     def prompt_attack(self) -> str:
         """Prompts the user to choose an attack to use"""
@@ -157,7 +159,7 @@ class Character:
             prelude=f"{self.name}'s Attacks:",
             prompt="Select an attack to use",
         )
-        return choice
+        return 'back' if choice is None else choice
 
     def attack(self, target: "Enemy", atk: str) -> bool:
         """Attacks a target using one of its attacks.

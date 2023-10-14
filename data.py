@@ -31,6 +31,17 @@ class Item:
                 f"type={self.type}, "
                 f"heal={self.heal}, "
                 f"damage={self.damage})")
+
+    def report(self) -> str:
+        """Return a simple item report.
+        Primarily for use in inventory display.
+        """
+        return (
+            f'Item : {self.name}  /'
+            f'\t Description : {self.description}  /'
+            f'\t Effect : {self.effect}  /'
+        f'\t Consumable : {self.consumable}'
+        )
         
 
 #Inventory and Items

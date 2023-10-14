@@ -32,6 +32,90 @@ class MUDGame:
         elif player == 'Player 4':
             self.player4 = character
 
+    def action_target(self) -> enemies.Enemy:
+        """Select an enemy in the room to target."""
+        enemy_list = self.current_room.grid.get_enemies()
+        choice = text.prompt_valid_choice(
+            enemy_list,
+            prompt='Choose an enemy to target',
+            errmsg='Enter a number corresponding to the surviving enemies.'
+        )
+        target = enemy_list[choice]
+        return target
+
+    def action_item(self, actor: characters.Character) -> bool:
+        """Prompt player for an item to use, and use it"""
+        is_use = actor.is_use_item()
+        if is_use == 'n':
+            return False
+        # Assume yes
+        items = [
+            item.report()
+            for item in actor.inventory.items()
+        ]
+        choice = text.prompt_valid_choice(
+            items,
+            cancel=True,
+            prompt="Choose an item to use",
+            errmsg="Invalid item",
+            prelude="Inventory:",
+        )
+        if not choice:
+            return False
+        item = items[choice]
+        print('')
+        used = actor.use_item(item)
+        if not used:
+            return False
+        return True
+
+    def action_check(self, actor: characters.Character) -> bool:
+        """Prompt player for stats to check, and display requested stats"""
+        check = actor.prompt_check()
+        if check == 'back':
+            return False
+        elif check == 'enemy':
+            enemy_list = self.current_room.grid.get_enemies()
+            for enemy in enemy_list:
+                enemy.get_stats()
+        elif check == 'party':
+            player_list = [
+                player
+                for player in (self.player1, self.player2, self.player3, self.player4)
+                if player is not None
+            ]
+            for ally in player_list:
+                ally.get_stats()
+        return True
+
+    def do_action(self, actor: characters.Character, target: "enemies.Enemy | None", action) -> "bool | enemies.Enemy":
+        """Carry out the selected action by the actor on the target.
+        Return True if successfully carried out, False otherwise.
+        (e.g. if player cancels action)
+
+        Special case: if a target is chosen,
+        returns the target (to be deprecated in future)
+        """
+        assert target is not None
+        if action == 'attack' or action == 0:
+            skill = actor.prompt_attack()
+            if skill == 'back':
+                return False
+            else:
+                actor.attack(target, skill)
+        elif action.lower() == 'target' or action == 1:
+            # TODO: keep track of target
+            target = self.action_target()
+            return target
+        elif action.lower() == 'check' or action == 2:
+            return self.action_check(actor)
+        elif action.lower() == 'item' or action == 3:
+            return self.action_item(actor)
+        else:
+            print(
+                f'Please select a valid action. Got {action}.')
+        return False
+
     def run(self):
         data.start_menu()
 
@@ -174,49 +258,10 @@ class MUDGame:
                             active_character.attack(target, '1')
                             k = (k + 1) % len(turn_order)
                             continue
-                        if action == 'attack' or action == 0:
-                            if target == None:
-                                print('Choose an enemy to target.\n')
-                                continue
-                            skill = active_character.prompt_attack()
-                            if skill == 'back':
-                                continue
-                            else:
-                                active_character.attack(target, skill)
-                                target = None
-                        elif action.lower() == 'target' or action == 1:
-                            choice = text.prompt_valid_choice(
-                                enemy_list,
-                                prompt='Choose an enemy to target',
-                                errmsg='Enter a number corresponding to the surviving enemies.'
-                            )
-                            target = enemy_list[choice]
-                            continue
-                        elif action.lower() == 'check' or action == 2:
-                            check = active_character.prompt_check()
-                            if check == 'enemy':
-                                for enemy in enemy_list:
-                                    enemy.get_stats()
-                            elif check == 'party':
-                                for ally in player_list:
-                                    ally.get_stats()
-                            continue
-                        elif action.lower() == 'item' or action == 3:
-                            is_use = active_character.is_use_item()
-                            if is_use == 'y':
-                                active_character.display_inventory()
-                                item = input("Choose an item to use. To cancel, enter 'cancel': ")
-                                item = item.lower()
-                                if item == 'cancel':
-                                    continue
-                                print('')
-                                used = active_character.use_item(item)
-                                if not used:
-                                    continue
-                        else:
-                            print(
-                                f'Please select a valid action. Got {action}.')
-                            continue
+
+                        result = self.do_action(active_character, target, action)
+                        if isinstance(result, enemies.Enemy):
+                            target = result
                     #Remove defeated characters
                     for character in turn_order:
                         if character.is_defeated():
@@ -295,55 +340,9 @@ class MUDGame:
                             active_character.attack(target, '1')
                             k = (k + 1) % len(turn_order)
                             continue
-                        if action == 'attack' or action == 0:
-                            if target == None:
-                                print('Choose an enemy to target.\n')
-                                continue
-                            skill = active_character.prompt_attack()
-                            if skill == 'back':
-                                continue
-                            else:
-                                active_character.attack(target, skill)
-                                target = None
-                        elif action.lower() == 'target' or action == 1:
-                            choice = text.prompt_valid_choice(
-                                enemy_list,
-                                prompt='Choose an enemy to target',
-                                errmsg='Enter a number corresponding to the surviving enemies.'
-                            )
-                            target = enemy_list[choice]
-                            continue
-                        elif action.lower() == 'check' or action == 2:
-                            check = active_character.prompt_check()
-                            if check == 'enemy':
-                                for enemy in enemy_list:
-                                    enemy.get_stats()
-                            elif check == 'party':
-                                for ally in player_list:
-                                    ally.get_stats()
-                            continue
-                        elif action.lower() == 'item' or action == 3:
-                            is_use = active_character.is_use_item()
-                            if is_use == 'y':
-                                active_character.display_inventory()
-                                items = [
-                                    item.report()
-                                    for item in active_character.inventory.items()
-                                ]
-                                choice = text.prompt_valid_choice(
-                                   items,
-                                    cancel=True,
-                                    prompt="Choose an item to use",
-                                    errmsg="Invalid item",
-                                    prelude="Inventory:",
-                                )
-                                if not choice:
-                                    continue
-                                item = items[choice]
-                                print('')
-                                used = active_character.use_item(item)
-                                if not used:
-                                    continue
+                        result = self.do_action(active_character, target, action)
+                        if isinstance(result, enemies.Enemy):
+                            target = result
                     #Remove defeated characters
                     for character in turn_order:
                         if character.is_defeated():

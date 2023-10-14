@@ -255,7 +255,7 @@ class MUDGame:
                         )
                         if active_character.has_status('Corrupted'):
                             target = random.choice(turn_order)
-                            active_character.attack(target, '1')
+                            active_character.attack(target, 0)
                             k = (k + 1) % len(turn_order)
                             continue
 
@@ -273,8 +273,8 @@ class MUDGame:
                                 enemy_list.remove(character)
                             elif character in player_list:
                                 player_list.remove(character)
-                    #Reduce count of status effects
-                    active_character.remove_status()
+                    #Update character state
+                    active_character.update()
                     #Check if victory or defeat
                     if characters.is_defeat(player_list):
                         self.gameOver = True
@@ -354,8 +354,8 @@ class MUDGame:
                                 enemy_list.remove(character)
                             elif character in player_list:
                                 player_list.remove(character)
-                    #Reduce count of status effects
-                    active_character.remove_status()
+                    # Update character state
+                    active_character.update()
                     #Check if victory or defeat
                     if characters.is_defeat(player_list):
                         self.gameOver = True

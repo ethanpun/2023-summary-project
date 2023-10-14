@@ -61,7 +61,10 @@ class Character:
         self.name = name
         self.health = health
         self.attacks = attacks
-        self.status = []
+        self.status: dict[str, "combat.Status | None"] = {
+            status: None
+            for status in combat.statuses
+        }
         self.item_equipped = None
         self.inventory = inventory
 
@@ -151,7 +154,7 @@ class Character:
         elif choice is None:
             return 'back'
 
-    def prompt_attack(self) -> str:
+    def prompt_attack(self) -> int | str:
         """Prompts the user to choose an attack to use"""
         choice = text.prompt_valid_choice(
             self.attacks,
@@ -190,8 +193,7 @@ class Character:
         if attack.healing:
             self.heal(attack.healing)
         if attack.inflicts:
-            status = combat.get_status(attack.inflicts)
-            target.add_status(status.name, status.count)
+            target.add_status(attack.inflicts)
             # Dirty hack for Resonance
             if status.name == "Resonance":
                 print(f"{self.name}'s attack leaves a resonating aura around {target.name}!")
@@ -205,44 +207,41 @@ class Character:
         """Subclasses must implement this method."""
         raise NotImplementedError
 
-    def add_status(self, status, turns):
-        """Adds status to a character"""
-        for st in combat.statuses:
-            if st['name'] == status:
-                temp = st.copy()
-                temp['count'] = turns
-                self.status.append(temp)
+    def add_status(self, status: "str | None") -> None:
+        """Adds status to a character.
+        Statuses are assumed not to stack.
+        If character already has a given status,
+        the existing status is replaced with a new one.
+        (This may need to be customized with a keyword argument in future.)
+        """
+        if status is None:
+            return
+        self.status[status] = combat.new_status(status)
 
-    def remove_status(self):
-        """Removes status from a character"""
-        for st in self.status:
-            st['count'] -= 1
-            if st['count'] == 0:
-                name = st['name']
-                print(f'{self.name} is no longer {name}!')
-                self.status.remove(st)
+    def update(self) -> None:
+        """Updates character state at end of turn."""
+        for name, status in self.status.items():
+            if status is None:
+                continue
+            status.update()
+            if status.count == 0:
+                self.status[name] = None
 
     def has_status(self, status):
-        """
-        If character has status, returns True, else returns False.
-        """
-        for st in self.status:
-            if st['name'] == status:
-                return True
-        return False
+        """If character has status, returns True, else returns False."""
+        return self.status[status] is not None
 
     def get_stats(self):
         """Displays a characters stats"""
         print(f"{self.name}'s stats")
         print(f"HP: {self.health} / 100")
-        if self.status == []:
+        if all(status is None for status in self.status.values()):
             print('Status: No statuses.')
         else:
-            for st in self.status:
-                name = st['name']
-                description = st['description']
-                turns = st['count']
-                print(f'Status : {name} , Description : {description} , Turns Remaining : {turns}\n')
+            for name, status in self.status.items():
+                if status is None:
+                    continue
+                print(f'Status : {name} , Description : {status.description} , Turns Remaining : {status.count}\n')
 
 
 

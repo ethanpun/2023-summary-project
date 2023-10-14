@@ -30,17 +30,29 @@ class Status:
         self.description = description
         self.count = count
 
+    def __repr__(self) -> str:
+        return f"Status({self.name}, {self.description}, {self.count})"
+
+    def update(self) -> None:
+        """Update status state at end of turn"""
+        assert self.count >= 0
+        self.count -= 1
+
 
 #Status
-statuses = {}
+statuses = []
 with open("statuses.json", "r") as f:
-    for record in json.load(f):
-        # ** operator unpacks dict data into keyword arguments
-        statuses[record["name"]] = Status(**record)
+    statusdata = {
+        record["name"]: record
+        for record in json.load(f)
+    }
+    statuses = list(statusdata.keys())
 
 
-def get_status(name: str) -> Status:
-    return statuses[name]
+def new_status(name: str) -> Status:
+    """Returns a new instance of the requested status"""
+    # ** operator unpacks dict data into keyword arguments
+    return Status(**statusdata[name])
 
 
 def infiltrated(damage):

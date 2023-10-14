@@ -34,7 +34,10 @@ class Enemy:
         self.health = health
         self.max_health = health
         self.attacks = attacks
-        self.status = status if status is not None else []
+        self.status: dict[str, "combat.Status | None"] = {
+            status: None
+            for status in combat.statuses
+        }
 
     def take_damage(self, damage: int):
         """Reduces health based on damage done"""
@@ -51,47 +54,41 @@ class Enemy:
         print('--------------------------------------------------------')
         print(f"It is {self.name}'s turn.")
 
-    def add_status(self, status, turns):
-        """Adds status to a character"""
-        for st in combat.statuses:
-            if st['name'] == status:
-                temp = st.copy()
-                temp['count'] = turns
-                self.status.append(temp)
+    def add_status(self, status: "str | None") -> None:
+        """Adds status to a character.
+        Statuses are assumed not to stack.
+        If character already has a given status,
+        the existing status is replaced with a new one.
+        (This may need to be customized with a keyword argument in future.)
+        """
+        if status is None:
+            return
+        self.status[status] = combat.new_status(status)
 
-    def remove_status(self):
-        """
-        Removes status from a character
-        """
-        for st in self.status:
-            st['count'] -= 1
-            if st['count'] == 0:
-                name = st['name']
-                print(f'{self.name} is no longer {name}!')
-                self.status.remove(st)
+    def update(self) -> None:
+        """Updates character state at end of turn."""
+        for name, status in self.status.items():
+            if status is None:
+                continue
+            status.update()
+            if status.count == 0:
+                self.status[name] = None
 
     def has_status(self, status):
-        """
-        If character has status, returns True, else returns False.
-        """
-        for st in self.status:
-            print (st)
-            if st['name'] == status:
-                return True
-        return False
+        """If character has status, returns True, else returns False."""
+        return self.status[status] is not None
 
     def get_stats(self):
         """Displays a characters stats"""
         print(f"{self.name}'s stats")
-        print(f"HP: {self.health} / {self.max_health}")
-        if self.status == []:
+        print(f"HP: {self.health} / 100")
+        if all(status is None for status in self.status.values()):
             print('Status: No statuses.')
         else:
-            for st in self.status:
-                name = st['name']
-                description = st['description']
-                turns = st['count']
-                print(f'Status : {name}  /\t Description : {description}  /\t Turns Remaining : {turns}')
+            for name, status in self.status.items():
+                if status is None:
+                    continue
+                print(f'Status : {name} , Description : {status.description} , Turns Remaining : {status.count}\n')
 
     def attack(self, target: "Character"):
         """Attacks a target using one of its attacks.
@@ -179,7 +176,7 @@ class Springtrap(Enemy):
         n = random.randint(1, 3)
         if n == '1':
             print(f'{self.name} used Phantom Mirage!')
-            self.add_status('Phantom', 1)
+            self.add_status('Phantom')
             damage = 7
             if target.has_status('Infiltrated'):
                 damage = combat.infiltrated(damage)            
@@ -261,14 +258,14 @@ class Glitchtrap(Enemy):
                     damage = combat.infiltrated(damage)
                 target.take_damage(damage)
                 print(f"{target.name} took {damage} damage!")
-                target.add_status('Corrupted', 1)
+                target.add_status('Corrupted')
                 print(f"{target.name} is corrupted!")
             else:
                 print('The attack missed!')
         if n > 15 and n < 31: #17% chance to use this attack
             print(f'{self.name} used Digital Infiltration on {target.name}!')
             if combat.accuracy(30, self, target) == True:
-                target.add_status('infiltrated', 1)
+                target.add_status('Infiltrated')
                 print(f"{self.name} infiltrated {target.name}'s system!")
             else:
                 print('The attack missed!')

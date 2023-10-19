@@ -1,6 +1,8 @@
 import json
 import random
 
+from common import Status
+
 
 #accuracy
 def accuracy(accuracy, attacker, target):
@@ -21,38 +23,6 @@ def accuracy(accuracy, attacker, target):
         return True
     else:
         return False
-
-
-class Status:
-    """Encapsulates status data"""
-    def __init__(self, name: str, description: str, count: int):
-        self.name = name
-        self.description = description
-        self.count = count
-
-    def __repr__(self) -> str:
-        return f"Status({self.name}, {self.description}, {self.count})"
-
-    def update(self) -> None:
-        """Update status state at end of turn"""
-        assert self.count >= 0
-        self.count -= 1
-
-
-#Status
-statuses = []
-with open("statuses.json", "r") as f:
-    statusdata = {
-        record["name"]: record
-        for record in json.load(f)
-    }
-    statuses = list(statusdata.keys())
-
-
-def new_status(name: str) -> Status:
-    """Returns a new instance of the requested status"""
-    # ** operator unpacks dict data into keyword arguments
-    return Status(**statusdata[name])
 
 
 def infiltrated(damage):

@@ -3,80 +3,29 @@ import time
 
 import attacks
 import combat
+from common import Combatant
 
 
-class Enemy:
+class Enemy(Combatant):
     """Base class for all enemies
 
-    Attributes:
-    name (str): Name of enemy
-    status (list): Shows statuses currently inflicted.
-    health (int): Max health of enemy
-
     Methods:
-    attack(character)
-    take_damage(x): Reduces health of character by x 
-    is_defeated(): Returns True if characters health is less than 0, else return False
-    display_turn(): Displays the characters turn
-    add_status(str): Adds status to a character 
-    remove_status(str): Removes status from a character
-    has_status(str): If character has status, returns True, else returns False. 
+    display_turn(): Displays the characters turn 
     get_stats(str): Displays a characters stats
-    attack(str): Attacks a target using one of its attacks 
+    attack(target): Attacks a target using one of its attacks
     """
 
     def __init__(self,
                  name: str,
                  health: int,
-                 attacks: list[attacks.Attack],
-                 status=None):
-        self.name = name
-        self.health = health
-        self.max_health = health
+                 attacks: list[attacks.Attack]):
+        super().__init__(name, health)
         self.attacks = attacks
-        self.status: dict[str, "combat.Status | None"] = {
-            status: None
-            for status in combat.statuses
-        }
-
-    def take_damage(self, damage: int):
-        """Reduces health based on damage done"""
-        self.health -= damage
-
-    def is_defeated(self):
-        """Returns True if characters health is less than 0, else return False"""
-        if self.health <= 0:
-            return True
-        return False
 
     def display_turn(self):
         """Displays the characters turn"""
         print('--------------------------------------------------------')
         print(f"It is {self.name}'s turn.")
-
-    def add_status(self, status: "str | None") -> None:
-        """Adds status to a character.
-        Statuses are assumed not to stack.
-        If character already has a given status,
-        the existing status is replaced with a new one.
-        (This may need to be customized with a keyword argument in future.)
-        """
-        if status is None:
-            return
-        self.status[status] = combat.new_status(status)
-
-    def update(self) -> None:
-        """Updates character state at end of turn."""
-        for name, status in self.status.items():
-            if status is None:
-                continue
-            status.update()
-            if status.count == 0:
-                self.status[name] = None
-
-    def has_status(self, status):
-        """If character has status, returns True, else returns False."""
-        return self.status[status] is not None
 
     def get_stats(self):
         """Displays a characters stats"""
@@ -90,7 +39,7 @@ class Enemy:
                     continue
                 print(f'Status : {name} , Description : {status.description} , Turns Remaining : {status.count}\n')
 
-    def attack(self, target: "Character"):
+    def attack(self, target: Combatant):
         """Attacks a target using one of its attacks.
         """
         attack = random.choice(self.attacks)
@@ -112,7 +61,7 @@ class Enemy:
 class GB(Enemy):
     """Basic common enemy found roaming the rooms."""
 
-    def __init__(self, status=None, health=50):
+    def __init__(self, health=50):
         super().__init__(
             'Glitch Bunny',
             health,
@@ -120,13 +69,12 @@ class GB(Enemy):
                 attacks.get("Bash"),
                 attacks.get("Ram"),
             ],
-            status
         )
 
 
 class BB(Enemy):
     """Basic common enemy found roaming the rooms."""
-    def __init__(self, status=None, health=75):
+    def __init__(self, health=75):
         super().__init__(
             'Balloon Boy',
             health,
@@ -134,7 +82,6 @@ class BB(Enemy):
                 attacks.get("Twirl"),
                 attacks.get("Balloon Entanglement"),
             ],
-            status
         )
 
 
@@ -144,7 +91,7 @@ class Springtrap(Enemy):
     Methods:
     encounter(): Displays dialogue when encountering Springtrap
     """
-    def __init__(self, status=None, health=250):
+    def __init__(self, health=250):
         super().__init__(
             'Springtrap',
             health,
@@ -153,7 +100,6 @@ class Springtrap(Enemy):
                 attacks.get("Decaying Grasp"),
                 attacks.get("Eternal Torment"),
             ],
-            status
         )
 
     def encounter(self):
@@ -212,7 +158,7 @@ class Glitchtrap(Enemy):
     spawn(): Turns Springtrap into Glitchtrap, initialising phase 2
     """
 
-    def __init__(self, status=None, health=275):
+    def __init__(self, health=275):
         super().__init__(
             'Glitchtrap',
             health,
@@ -222,7 +168,7 @@ class Glitchtrap(Enemy):
                 attacks.get("System Overload"),
                 attacks.get("Pixel Blast"),
             ],
-            status)
+        )
 
     def spawn():
         """

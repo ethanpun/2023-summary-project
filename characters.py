@@ -2,6 +2,7 @@ import random
 
 import attacks
 import combat
+from common import Combatant
 import data
 import text
 
@@ -24,13 +25,10 @@ def is_victory(enemies: list) -> bool:
     return False
 
 
-class Character:
+class Character(Combatant):
     """Base class for game characters.
 
     Attributes:
-    name (str): The name of the character.
-    status (list): Shows statuses currently inflicted.
-    health (int): Max health of character.
     inventory (list): Shows items collected.
     item_equipped (dict): The currently equipped item.
 
@@ -40,16 +38,11 @@ class Character:
     is_use_item(): Confirms with the player whether they want to use the item
     use_item(str): Uses a selected item in the player's inventory
     heal(x): Restores a character's health by a certain amount.
-    take_damage(x): Reduces health of character by x 
-    is_defeated(): Returns True if character's health is less than 0, else return False
     display_turn(): Displays the character's turn
     prompt_check(str): Allows user to check the stats of party or enemy
     prompt_attack(): Prompts the user to choose an attack to use
     attack(str): Attacks a target using one of its attacks
-    passive(str): Increases damage by a multiplier under certain conditions
-    add_status(str): Adds status to a character 
-    remove_status(str): Removes status from a character
-    has_status(str): If character has status, returns True, else returns False. 
+    passive(str): Increases damage by a multiplier under certain conditions 
     get_stats(str): Displays a character's stats
      
     """
@@ -124,16 +117,6 @@ class Character:
         self.health += amnt
         print(f"{self.name} healed {amnt} hp!")
 
-    def take_damage(self, damage_taken):
-        """Reduces health of character by x"""
-        self.health -= damage_taken
-
-    def is_defeated(self):
-        """Returns True if character's health is less than 0, else return False"""
-        if self.health <= 0:
-            return True
-        return False
-
     def display_turn(self):
         """Displays the character's turn"""
         print('--------------------------------------------------------')
@@ -207,30 +190,6 @@ class Character:
         """Subclasses must implement this method."""
         raise NotImplementedError
 
-    def add_status(self, status: "str | None") -> None:
-        """Adds status to a character.
-        Statuses are assumed not to stack.
-        If character already has a given status,
-        the existing status is replaced with a new one.
-        (This may need to be customized with a keyword argument in future.)
-        """
-        if status is None:
-            return
-        self.status[status] = combat.new_status(status)
-
-    def update(self) -> None:
-        """Updates character state at end of turn."""
-        for name, status in self.status.items():
-            if status is None:
-                continue
-            status.update()
-            if status.count == 0:
-                self.status[name] = None
-
-    def has_status(self, status):
-        """If character has status, returns True, else returns False."""
-        return self.status[status] is not None
-
     def get_stats(self):
         """Displays a characters stats"""
         print(f"{self.name}'s stats")
@@ -247,13 +206,7 @@ class Character:
 
 #Characters
 class Freddy(Character):
-    """
-    Data for Freddy character that players can choose to play as.
-
-    Attributes:
-    status (list): Shows statuses currently inflicted.
-    health (int): Max health of character.
-    inventory(list): Shows items collected.
+    """Data for Freddy character that players can choose to play as.
 
     Methods:
     passive(str): Increases damage if target is asleep  
@@ -283,13 +236,9 @@ class Freddy(Character):
 class Bonnie(Character):
     """Data for Bonnie character that players can choose to play as.
 
-    Attributes:
-    status (list): Shows statuses currently inflicted.
-    health (int): Max health of character.
-    inventory(list): Shows items collected.
-
     Methods:
-    passive(str): Increases damage by a multiplier of 1 to 10 if target has resonance
+    passive(str): Increases damage by a multiplier of 1 to 10
+                  if target has resonance
     """
     def __init__(self,
                  health: int,
@@ -306,8 +255,8 @@ class Bonnie(Character):
         )
             
     def passive(self, target):
-        """
-        Increases damage by a multiplier of 1 to 10 if target has resonance
+        """Increases damage by a multiplier of 1 to 10
+        if target has resonance
         """
         if target.has_status('Resonance'):
             multiplier = random.randint(1, 10)
@@ -318,16 +267,9 @@ class Bonnie(Character):
 
 
 class Foxy(Character):
-    """
-    Data for Foxy character that players can choose to play as.
-
-    Attributes:
-    status (list): Shows statuses currently inflicted.
-    health (int): Max health of character.
-    inventory(list): Shows items collected.
+    """Data for Foxy character that players can choose to play as.
 
     Methods:
-    prompt_attack(): Prompts the user to choose an attack to use
     attack(str): Attacks a target using one of its attacks
     passive(str): Increases damage by 30% if Foxy has less than half health
     """
@@ -379,16 +321,12 @@ class Foxy(Character):
 
 
 class Chica(Character):
-    """
-    Data for Chica character that players can choose to play as.
+    """Data for Chica character that players can choose to play as.
 
     Attributes:
-    status (list): Shows statuses currently inflicted.
-    health (int): Max health of character.
     inventory(list): Shows items collected.
 
     Methods:
-    prompt_attack(): Prompts the user to choose an attack to use
     attack(str): Attacks a target using one of its attacks
     passive(str): If cupcake is present, heals Chica for 10 each turn. When cupcake is destroyed, deals 20 damage to targetted opponent
     """

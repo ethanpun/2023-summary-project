@@ -1,7 +1,7 @@
 import json
 import random
 
-from common import Status
+from common import Combatant, Status
 
 
 #accuracy
@@ -54,3 +54,21 @@ def is_victory(enemies: list) -> bool:
     if len(enemies) == 0:
         return True
     return False
+
+
+class Party:
+    """A group of combatants on the same side"""
+    def __init__(self, members: list[Combatant]):
+        # Do not reference members argument directly
+        # to avoid inadvertent mutation
+        self._members = []
+        for member in members:
+            self._members.append(member)
+
+    def is_defeated(self) -> bool:
+        """Return True if all party members are defeated"""
+        return all(member.is_defeated() for member in self.members)
+
+    def members(self) -> list[Combatant]:
+        """Return a list of all party members"""
+        return self._members.copy()

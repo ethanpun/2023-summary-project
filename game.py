@@ -1,7 +1,9 @@
+from itertools import zip_longest
 import random
 import time
 
 import characters
+from combat import Party
 import data
 import enemies
 import text
@@ -210,43 +212,40 @@ class MUDGame:
                 self.current_room.display_room()
                 print('Battle started.\n')
                 #Determine turn order
-                player_list = [
-                    self.player1, self.player2, self.player3, self.player4
-                ]
-                enemy_list = self.current_room.grid.get_enemies()
-                copy_enemy_list = enemy_list.copy()
+                player_party = Party(
+                    [player
+                    for player in (self.player1, self.player2, self.player3, self.player4)
+                    if player is not None]
+                )
+                enemy_party = Party(self.current_room.grid.get_enemies())
                 turn_order = []
-                i = 0
-                while len(player_list) != 0 and len(copy_enemy_list) != 0:
-                    if len(player_list) != 0:
-                        if player_list[i] != None:
-                            turn_order.append(player_list[i])
-                            player_list.pop(i)
-                    if len(copy_enemy_list) != 0:
-                        turn_order.append(copy_enemy_list[i])
-                        copy_enemy_list.pop(i)
+                for player, enemy in zip_longest(player_party.members(), enemy_party.members()):
+                    if player:
+                         turn_order.append(player)
+                    if enemy:
+                         turn_order.append(enemy)
+
                 #Combat
-                player_list = [
-                    self.player1, self.player2, self.player3, self.player4
-                ]
-                player_list = [player for player in player_list if player != None]
                 k = 0                        
                 target = None
-                while not characters.is_defeat(player_list) and not characters.is_victory(enemy_list):
+                while not (player_party.is_defeated() or enemy_party.is_defeated()):
                     active_character = turn_order[(k % len(turn_order))]
+                    if active_character.is_defeated():
+                        k = (k + 1) % len(turn_order)
+                        continue
                     if active_character.has_status('Sleeping'):
                         print(f"{active_character.name} is asleep.")
                         k = (k + 1) % len(turn_order)
                         continue
                     active_character.display_turn()
-                    if active_character in enemy_list:
+                    if isinstance(active_character, enemies.Enemy):
                         time.sleep(1)
-                        target = random.choice(player_list)
+                        target = random.choice(player_party.members())
                         if active_character.has_status('Corrupted'):
                             target = random.choice(turn_order)
                         active_character.attack(target)
                         target = None
-                    elif active_character in player_list:
+                    elif isinstance(active_character, characters.Character):
                         action = text.prompt_valid_choice(
                             ACTIONS,
                             prompt='Please choose an action',
@@ -262,25 +261,17 @@ class MUDGame:
                         result = self.do_action(active_character, target, action)
                         if isinstance(result, enemies.Enemy):
                             target = result
-                    #Remove defeated characters
-                    for character in turn_order:
-                        if character.is_defeated():
-                            if k >= turn_order.index(character):
-                                k = k - 1
-                            print(f"{character.name} has died.")
-                            turn_order.remove(character)
-                            if character in enemy_list:
-                                enemy_list.remove(character)
-                            elif character in player_list:
-                                player_list.remove(character)
+                    if active_character.is_defeated():
+                        print(f"{active_character.name} has died.")
                     #Update character state
-                    active_character.update()
+                    else:
+                        active_character.update()
                     #Check if victory or defeat
-                    if characters.is_defeat(player_list):
+                    if player_party.is_defeated():
                         self.gameOver = True
                         print("Party defeated. Looks like you'll forgotten, just like the other animatronics down here who met their demise.")
                         break
-                    elif characters.is_victory(enemy_list):
+                    elif enemy_party.is_defeated():
                         print('Encounter survived.')
                         self.current_room.grid.clear_tile()
                         break
@@ -291,30 +282,23 @@ class MUDGame:
                 self.current_room.display_room()
                 print('Battle started.\n')
                 #Determine turn order
-                player_list = [
-                    self.player1, self.player2, self.player3, self.player4
-                ]
-                enemy_list = [self.boss]
+                player_party = Party(
+                    player
+                    for player in (self.player1, self.player2, self.player3, self.player4)
+                    if player is not None
+                )
+                enemy_party = Party([self.boss])
                 turn_order = []
-                i = 0
-                while len(player_list) != 0 and len(enemy_list) != 0:
-                    if len(player_list) != 0:
-                        if player_list[i] != None:
-                            turn_order.append(player_list[i])
-                            player_list.pop(i)
-                    if len(enemy_list) != 0:
-                        turn_order.append(enemy_list[i])
-                        enemy_list.pop(i)
+                for player, enemy in zip_longest(player_party.members(), enemy_party.members()):
+                    if player:
+                        turn_order.append(player)
+                    if enemy:
+                        turn_order.append(enemy)
+                
                 #Combat
-                player_list = [
-                    self.player1, self.player2, self.player3, self.player4
-                ]
-                player_list = [player for player in player_list if player != None]
-                enemy_list = [self.boss]
                 k = 0                        
                 target = None
-                while not characters.is_defeat(player_list) and not characters.is_victory(
-                        enemy_list):
+                while not (player_party.is_defeated() or enemy_party.is_defeated()):
                     active_character = turn_order[(k % len(turn_order))]
                     if active_character.has_status('Sleeping'):
                         print(f"{active_character.name} is asleep.")
@@ -323,7 +307,7 @@ class MUDGame:
                     active_character.display_turn()
                     if active_character in enemy_list:
                         time.sleep(1)
-                        target = random.choice(player_list)
+                        target = random.choice(player_party.members())
                         if active_character.has_status('Corrupted'):
                             target = random.choice(turn_order)
                         active_character.attack(target)

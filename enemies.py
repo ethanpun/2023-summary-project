@@ -58,6 +58,22 @@ class Enemy(Combatant):
         print('\n')
 
 
+class Boss(Enemy):
+    """Base class for bosses.
+
+    Attributes:
+    next_phase (Boss | None)
+      The next phase of the boss
+
+    Methods:
+    encounter(): Displays dialogue when encountering boss
+    """
+    next_phase: "Boss"
+
+    def encounter(self) -> None:
+        raise NotImplementedError
+
+
 class GB(Enemy):
     """Basic common enemy found roaming the rooms."""
 
@@ -85,16 +101,8 @@ class BB(Enemy):
         )
 
 
-class Springtrap(Enemy):
-    """The boss that the player has to defeat in order to win.
-
-    Attributes:
-    next_phase (Enemy | None)
-      The next phase of the boss
-    
-    Methods:
-    encounter(): Displays dialogue when encountering Springtrap
-    """
+class Springtrap(Boss):
+    """The boss that the player has to defeat in order to win."""
     def __init__(self, health=250):
         super().__init__(
             'Springtrap',
@@ -107,7 +115,7 @@ class Springtrap(Enemy):
         )
         self.next_phase = Glitchtrap
 
-    def encounter(self):
+    def encounter(self) -> None:
         """Plays dialogue when encountering Springtrap, notifying the player."""
         print('You notice the pungent smell of decaying matter.')
         time.sleep(2)
@@ -154,12 +162,8 @@ class Springtrap(Enemy):
         print('\n')
 
 
-class Glitchtrap(Enemy):
-    """Phase 2 of Springtrap that once defeated will finish the game.
-    
-    Methods:
-    spawn(): Turns Springtrap into Glitchtrap, initialising phase 2
-    """
+class Glitchtrap(Boss):
+    """Phase 2 of Springtrap that once defeated will finish the game."""
 
     def __init__(self, health=275):
         super().__init__(
@@ -173,7 +177,7 @@ class Glitchtrap(Enemy):
             ],
         )
 
-    def encounter():
+    def encounter(self) -> None:
         """Turns Springtrap into Glitchtrap, initialising phase 2"""
         print('Or has he?')
         time.sleep(2)

@@ -7,24 +7,6 @@ import data
 import text
 
 
-#Win and lose conditions
-def is_defeat(players: list) -> bool:
-    """
-    Returns True if user lost, else returns False
-    """
-    if len(players) == 0:
-        return True
-    return False
-
-def is_victory(enemies: list) -> bool:
-    """
-    Returns True if user won, else returns False
-    """
-    if len(enemies) == 0:
-        return True
-    return False
-
-
 class Character(Combatant):
     """Base class for game characters.
 

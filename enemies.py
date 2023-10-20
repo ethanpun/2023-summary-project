@@ -68,7 +68,7 @@ class Boss(Enemy):
     Methods:
     encounter(): Displays dialogue when encountering boss
     """
-    next_phase: "Boss"
+    next_phase: "Boss | None" = None
 
     def encounter(self) -> None:
         raise NotImplementedError

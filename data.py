@@ -187,9 +187,8 @@ class Room:
             print('It seems that this door is locked.')
 
     def next_room(self, next : str) -> 'Room':
-        '''
-        User moves to next room. Depending on the input, move to room above, below, left or right. Also, check if next room for given input exists.
-        '''
+        """User moves to next room. Depending on the input, move to room above, below, left or right. Also, check if next room for given input exists.
+        """
         next = next.lower()
         if next == 'w':
             return self.up
@@ -200,9 +199,9 @@ class Room:
         elif next == 'd':
             return self.right
     def current_room(self) -> 'Room':
-        '''
+        """
         Returns the current room
-        '''
+        """
         return self
 
     def count_layer(self):
@@ -217,9 +216,9 @@ class Room:
         return False
 
     def get_boss(self):
-        '''
+        """
         Return the boss.
-        '''
+        """
         return self.boss
 
 class Grid:
@@ -261,29 +260,24 @@ class Grid:
 
         
     def get_position(self) -> list:
-        '''
-        Return user position
-        '''
+        """Return user position"""
         return self.coordinates
+
     def prompt_movement(self) -> str:
-        '''
-        Prompt the user for a movement and return the direction to move. Also, to view inventory, user types open inventory
-        '''
+        """Prompt the user for a movement and return the direction to move.
+        Also, to view inventory, user types open inventory
+        """
         print("Type 'wasd' to move, open the inventory by typing 'inventory'")
         action = input('Type an action: ')
         print('--------------------------------------------------------')
         return action.lower()
         
     def move(self, position : list):
-        '''
-        Update user position and coordinates in the room
-        '''
+        """Update user position and coordinates in the room"""
         self.coordinates = position
     
     def is_encounter(self):
-        '''
-        Return true if user coordinates are currently on a creature tile.
-        '''
+        """Return true if user coordinates are currently on a creature tile."""
         if self.grid[self.get_position()[0]][self.get_position()[1]] is None:
             return False
         elif self.grid[self.get_position()[0]][self.get_position()[1]]['type'] == 'creature':
@@ -291,15 +285,11 @@ class Grid:
         return False
 
     def get_enemies(self):
-        '''
-        Return the enemies on that tile
-        '''
+        """Return the enemies on that tile."""
         coordinates = self.get_position()
         return self.grid[coordinates[0]][coordinates[1]]['creatures']
     def is_item(self):
-        '''
-        Return true if user coordinates are currently on a item tile.
-        '''
+        """Return true if user coordinates are currently on a item tile."""
         if self.grid[self.get_position()[0]][self.get_position()[1]] is None:
             return False
         elif self.grid[self.get_position()[0]][self.get_position()[1]]['type'] == 'item':
@@ -307,15 +297,11 @@ class Grid:
         return False
             
     def get_item(self) -> str:
-        '''
-        If user is on an item tile, return the item on that tile
-        '''
+        """If user is on an item tile, return the item on that tile"""
         return self.grid[self.get_position()[0]][self.get_position()[1]]['item']['name']
         
     def clear_tile(self):
-        '''
-        After a defeating a creature or picking up an item, remove it from the grid
-        '''
+        """After a defeating a creature or picking up an item, remove it from the grid"""
         self.grid[self.get_position()[0]][self.get_position()[1]] = None
 
 
@@ -323,9 +309,7 @@ with open("characters.json", "r") as f:
     char_info = json.load(f)
 
 def info(name: str):
-    """
-    Displays information of the playable characters
-    """
+    """Displays information of the playable characters"""
     if name not in char_info:
         return
     character = char_info[name]
@@ -341,9 +325,7 @@ def info(name: str):
     print('--------------------------------------------------------')
     
 def choose_character(player):
-    """
-    Prompts the user to select a character to play as
-    """
+    """Prompts the user to select a character to play as"""
     print('Characters:')
     for i,character in enumerate(char_info.values(), start=1):
         print(f'{i}. {character["Name"]}')
@@ -374,9 +356,7 @@ def choose_character(player):
         
 #End
 def Ending():
-    """
-    Plays the end sequence after Glitchtrap is defeated
-    """
+    """Plays the end sequence after Glitchtrap is defeated"""
     print('Glitchtrap: No! This cannot be!')
     time.sleep(2)
     print('Glitchtrap: I cannot be defeated by an animatronic!')

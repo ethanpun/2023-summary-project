@@ -235,7 +235,7 @@ class MUDGame:
         """
         assert target is not None
         if action == 'attack' or action == 0:
-            attack = actor.prompt_attack()
+            attack = actor.select_attack()
             if attack == 'back':
                 return False
             else:

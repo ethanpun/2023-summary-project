@@ -23,7 +23,7 @@ class Character(Combatant):
     heal(x): Restores a character's health by a certain amount.
     display_turn(): Displays the character's turn
     prompt_check(str): Allows user to check the stats of party or enemy
-    prompt_attack(): Prompts the user to choose an attack to use
+    select_attack(): Prompts the user to choose an attack to use
     attack(str): Attacks a target using one of its attacks
     get_stats(str): Displays a character's stats
      
@@ -127,8 +127,8 @@ class Character(Combatant):
         elif choice is None:
             return 'back'
 
-    def prompt_attack(self) -> Attack | str:
-        """Prompts the user to choose an attack to use"""
+    def select_attack(self) -> Attack | str:
+        """Prompts the user to select an attack to use"""
         choice = text.prompt_valid_choice(
             [a.name for a in self.attacks],
             cancel=True,

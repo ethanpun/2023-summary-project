@@ -82,7 +82,7 @@ class Character(Combatant):
                     self.inventory.remove_item(item)
                     return True
                 elif item.type == 'weapon':  # If item is weapon
-                    if self.items_equipped != None:
+                    if self.items_equipped is not None:
                         print('You already have a weapon equipped.')
                         return False
                     else:
@@ -129,50 +129,51 @@ class Character(Combatant):
         )
         return 'back' if choice is None else choice
 
+    def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
+        """Determines the damage to be dealt to target by attack, and returns it."""
+        if not attack.damage:
+            return 0
+        if self.item_equipped:
+            damage += self.item_equipped.damage
+        if attack.repeats:
+            lower, upper = attack.repeats
+            hits = random.randint(lower, upper)
+        else:
+            hits = 1
+        damage += attack.damage * hits
+        return damage
+        
+
     def attack(self, target: Combatant, atk: str) -> bool:
         """Attacks a target using one of its attacks.
         Returns True if the attack succeeded, otherwise False.
         """
-        damage = 0
-        damage += self.passive(target)
-        if self.item_equipped:
-            damage += self.item_equipped.damage
         assert atk in "123"
         attack = self.attacks[int(atk) - 1]
+        damage = self.get_attack_damage(target, attack, 0)
         print(f'{self.name} used {attack.name} on {target.name}!')
         # If attack has accuracy, determine if attack misses
         if attack.accuracy and not combat.accuracy(attack.accuracy, self, target):
             print('The attack missed!')
             return False
         # Attack hits
-        if attack.damage:
-            if attack.repeats:
-                lower, upper = attack.repeats
-                hits = random.randint(lower, upper)
-                print(f'{target.name} was hit {hits} times!')
-            else:
-                hits = 1
-            damage += attack.damage * hits
-            if target.has_status('Infiltrated'):
-                damage = combat.infiltrated(damage)
-            print(f"{target.name} took {damage} damage!")
-            target.take_damage(damage)
+        # print(f'{target.name} was hit {hits} times!')
+        # if target.has_status('Infiltrated'):
+            # damage = combat.infiltrated(damage)
+        print(f"{target.name} took {damage} damage!")
+        target.take_damage(damage)
         if attack.healing:
             self.heal(attack.healing)
         if attack.inflicts:
             target.add_status(attack.inflicts)
-            # Dirty hack for Resonance
-            if attack.inflicts.name == "Resonance":
-                print(f"{self.name}'s attack leaves a resonating aura around {target.name}!")
-            # Dirty hack for Harvest Moon
-            if attack.inflicts.name == "Harvest Moon":
-                print(f"{self.name}'s attack and accuracy rose!")
+        # Dirty hack for Resonance
+        if attack.inflicts.name == "Resonance":
+            print(f"{self.name}'s attack leaves a resonating aura around {target.name}!")
+        # Dirty hack for Harvest Moon
+        if attack.inflicts.name == "Harvest Moon":
+            print(f"{self.name}'s attack and accuracy rose!")
         print('\n')
         return True
-
-    def passive(self, target: Combatant) -> int:
-        """Subclasses must implement this method."""
-        raise NotImplementedError
 
     def get_stats(self):
         """Displays a characters stats"""
@@ -187,14 +188,9 @@ class Character(Combatant):
                 print(f'Status : {name} , Description : {status.description} , Turns Remaining : {status.count}\n')
 
 
-
 #Characters
 class Freddy(Character):
-    """Data for Freddy character that players can choose to play as.
-
-    Methods:
-    passive(str): Increases damage if target is asleep  
-    """
+    """Data for Freddy character that players can choose to play as."""
     def __init__(self,
                  health: int,
                  inventory: data.Inventory):
@@ -208,22 +204,14 @@ class Freddy(Character):
             ],
             inventory
         )
-            
-    def passive(self, target: Combatant):
-        """Increases damage if target is asleep"""
-        if target.has_status('Sleeping'):
-            return 5
-        else:
-            return 0
+
+    def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
+        damage = 5 if target.has_status('Sleeping') else 0
+        return super().get_attack_damage(target, attack, damage)
 
 
 class Bonnie(Character):
-    """Data for Bonnie character that players can choose to play as.
-
-    Methods:
-    passive(str): Increases damage by a multiplier of 1 to 10
-                  if target has resonance
-    """
+    """Data for Bonnie character that players can choose to play as."""
     def __init__(self,
                  health: int,
                  inventory: data.Inventory):
@@ -237,26 +225,14 @@ class Bonnie(Character):
             ],
             inventory
         )
-            
-    def passive(self, target):
-        """Increases damage by a multiplier of 1 to 10
-        if target has resonance
-        """
-        if target.has_status('Resonance'):
-            multiplier = random.randint(1, 10)
-            return multiplier
-        else:
-            return 0
 
+    def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
+        multiplier = random.randint(1, 10) if target.has_status('Resonance') else 1
+        return multiplier * super().get_attack_damage(target, attack, 0)
 
 
 class Foxy(Character):
-    """Data for Foxy character that players can choose to play as.
-
-    Methods:
-    attack(str): Attacks a target using one of its attacks
-    passive(str): Increases damage by 30% if Foxy has less than half health
-    """
+    """Data for Foxy character that players can choose to play as."""
     def __init__(self,
                  health: int,
                  inventory: data.Inventory):
@@ -270,50 +246,24 @@ class Foxy(Character):
             ],
             inventory
         )
-
-    def attack(self, target, atk) -> bool:
-        """
-        Prompts the user to choose an attack to use
-        """
-        assert atk in "123"
-        attack = self.attacks[int(atk) - 1]
-        success = super().attack(target, atk)
-        if not success:
-            return success
-        if attack.name == "Harvest Moon":
-            return success
-        damage = 0
+            
+    def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
         if self.has_status('Nightfall'):
             damage += 15
+        if self.health < self.max_health / 2:
+            return combat.instinct(damage)
+        else:
+            return damage
+
+    def update(self) -> None:
+        if self.has_status('Nightfall'):
             self.heal(20)
             print(f"{self.name} leeched {target.name}'s health!")
-            print(f"{target.name} took {damage} damage!")
-            target.take_damage(damage)
-        print('\n')
-        return success
-            
-    def passive(self, damage):
-        """
-        Increases damage by 30% if Foxy has less than half health
-        """
-        if self.health < 50:
-            damage = combat.instinct(damage)
-            return damage
-        else:
-            return 0
-
+        super().update()
 
 
 class Chica(Character):
-    """Data for Chica character that players can choose to play as.
-
-    Attributes:
-    inventory(list): Shows items collected.
-
-    Methods:
-    attack(str): Attacks a target using one of its attacks
-    passive(str): If cupcake is present, heals Chica for 10 each turn. When cupcake is destroyed, deals 20 damage to targetted opponent
-    """
+    """Data for Chica character that players can choose to play as."""
     def __init__(self,
                  health: int,
                  inventory: data.Inventory):
@@ -329,50 +279,33 @@ class Chica(Character):
         )
         self.cupcake = None
 
-    def attack(self, target, atk):
-        """
-        Attacks a target using one of its attacks
-        """
-        assert atk in "123"
-        attack = self.attacks[int(atk) - 1]
+    def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
+        damage = 0
         if attack.name == "Cupcake Decoy":
-            if self.cupcake:
+            if not self.cupcake:
                 print(f'{self.name} used Cupcake decoy!')
                 print(f'{self.name} placed a cupcake in place of her.')
                 self.cupcake = 50
             else:
                 print('There is already a cupcake in place!')
-            print('\n')
-            return True
-        elif attack.name == "Devour":
-            if combat.accuracy(40, self, target):
-                damage = 0
-                if self.cupcake and self.cupcake > 0:
-                    damage += 125
-                    print(f"{self.name} devoured the cupcake. Damage Increased.")
-                    print(f"{target.name} took {damage} damage!")
-                    self.cupcake = 0
-
-                else:
-                    damage += 30
-                    print(f"{target.name} took {damage} damage!")
-                target.take_damage(damage)
-            else:
-                print('The attack missed!')
-                return False
-            print('\n')
-            return True
-        else:
-            return super().attack(target, atk)
-
-            
-    def passive(self, target):
+            return damage
+        if attack.name == "Devour":
+            if self.cupcake and self.cupcake > 0:
+                damage += 125
+                print(f"{self.name} devoured the cupcake. Damage Increased.")
+                print(f"{target.name} took {damage} damage!")
+                self.cupcake = 0
+        return super().get_attack_damage(target, attack, damage)
+    
+    def update(self) -> None:
         """
-        If cupcake is present, heals Chica for 10 each turn. When cupcake is destroyed, deals 20 damage to targetted opponent
+        If cupcake is present, heals Chica for 10 each turn. When cupcake is destroyed, deals 20 damage to targetted opponent (NOT WORKING)
         """
         if self.cupcake is not None:
-            target.take_damage(20)
-            print(f'The cupcake exploded and dealt 20 damage to {target.name}!')
+            # target.take_damage(20)
+            # print(f'The cupcake exploded and dealt 20 damage to {target.name}!')
+            pass
         else:
             self.heal(10)
             print(f"The cupcake healed {self.name}'s HP!")
+        super().update()

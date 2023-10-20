@@ -44,7 +44,10 @@ class MUDGame:
             for player in (self.player1, self.player2, self.player3, self.player4)
             if player is not None]
         )
-        enemy_party = Party(self.current_room.grid.get_enemies())
+        if self.current_room.is_boss():
+            enemy_party = Party([self.boss])
+        else:
+            enemy_party = Party(self.current_room.grid.get_enemies())
         turn_order = []
         for player, enemy in zip_longest(player_party.members(), enemy_party.members()):
             if player:

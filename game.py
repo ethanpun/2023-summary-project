@@ -70,11 +70,10 @@ class MUDGame:
                 continue
             active_character.display_turn()
             if isinstance(active_character, enemies.Enemy):
-                time.sleep(1)
                 target = random.choice(player_party.members())
                 if active_character.has_status('Corrupted'):
                     target = random.choice(turn_order)
-                    attack = active_character.select_attack()
+                    attack = active_character.get_attack()
                 active_character.attack(target, attack)
                 target = None
             elif isinstance(active_character, characters.Character):

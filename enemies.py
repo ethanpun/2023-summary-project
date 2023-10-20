@@ -42,6 +42,7 @@ class Enemy(Combatant):
 
     def select_attack(self) -> Attack:
         """Select an attack to use in combat"""
+        time.sleep(1)
         attack = random.choice(self.attacks)
         return attack
 
@@ -194,6 +195,7 @@ class Glitchtrap(Boss):
 
     def select_attack(self) -> Attack | str:
         """Select an attack to use in combat"""
+        time.sleep(1)
         attack = combat.dice_roll({
             self.attacks[0]: 28,
             self.attacks[1]: 17,

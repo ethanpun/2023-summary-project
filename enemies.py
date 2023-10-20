@@ -1,6 +1,7 @@
 import random
 import time
 
+from attacks import Attack
 import attacks
 import combat
 from common import Combatant
@@ -39,34 +40,39 @@ class Enemy(Combatant):
                     continue
                 print(f'Status : {name} , Description : {status.description} , Turns Remaining : {status.count}\n')
 
+    def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
+        """Determines the damage to be dealt to target by attack, and returns it."""
+        if not attack.damage:
+            return 0
+        if attack.repeats:
+            lower, upper = attack.repeats
+            hits = random.randint(lower, upper)
+        else:
+            hits = 1
+        damage += attack.damage * hits
+        return damage
+
     def attack(self, target: Combatant) -> bool:
         """Attacks a target using one of its attacks.
         Returns True if the attack succeeded, otherwise False.
         """
-        damage = 0
         attack = random.choice(self.attacks)
         if not attack:
             print(f"{self.name} has no attacks available!")
-            return
+            return False
+
         print(f"{self.name} used {attack.name} on {target.name}!")
+        
         # If attack has accuracy, determine if attack misses
         if attack.accuracy and not combat.accuracy(attack.accuracy, self, target):
             print('The attack missed!')
             return False
         # Attack hits
-        if attack.damage:
-            if attack.repeats:
-                lower, upper = attack.repeats
-                hits = random.randint(lower, upper)
-                print(f'{target.name} was hit {hits} times!')
-            else:
-                hits = 1
-            damage += attack.damage * hits
-            if target.has_status('Infiltrated'):
-                damage = combat.infiltrated(damage)
-            print(f"{target.name} took {damage} damage!")
-            target.take_damage(damage)
+        damage = self.get_attack_damage(target, attack)
+        print(f"{target.name} took {damage} damage!")
+        target.take_damage(damage)
         print('\n')
+        return True
 
 
 class Boss(Enemy):
@@ -139,6 +145,12 @@ class Springtrap(Boss):
         time.sleep(3)
         print('Springtrap.')
 
+    def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
+        damage = self.get_attack_damage(target, attack)
+        if target.has_status('Infiltrated'):
+            damage = combat.infiltrated(damage)
+        return damage
+
 
 class Glitchtrap(Boss):
     """Phase 2 of Springtrap that once defeated will finish the game."""
@@ -175,6 +187,12 @@ class Glitchtrap(Boss):
         time.sleep(5)
         print('Glitchtrap: The time of reckoning, has begun.')
 
+    def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
+        damage = self.get_attack_damage(target, attack)
+        if target.has_status('Infiltrated'):
+            damage = combat.infiltrated(damage)
+        return damage
+
     def attack(self, target):
         print(f"{self.name} attacks {target.name}!")
         attack = combat.dice_roll({
@@ -206,8 +224,7 @@ class Glitchtrap(Boss):
             else:
                 hits = 1
             damage += attack.damage * hits
-            if target.has_status('Infiltrated'):
-                damage = combat.infiltrated(damage)
+            
             print(f"{target.name} took {damage} damage!")
             target.take_damage(damage)
         print('\n')

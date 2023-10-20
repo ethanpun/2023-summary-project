@@ -1,7 +1,19 @@
-import json
 import random
 
-from common import Combatant, Status
+from common import Combatant
+
+
+def dice_check(success: int) -> bool:
+    """Roll a dice to check success.
+
+    Arguments
+    ---------
+    - success: int
+      The chance of success, from 0 to 100.
+
+    Return: True if successful, False if unsuccessful.
+    """
+    return random.randint(0, 100) <= success
 
 
 #accuracy
@@ -14,15 +26,7 @@ def accuracy(accuracy, attacker, target):
         accuracy -= 10
     if attacker.has_status('Nightfall'):
         accuracy += 20
-    if accuracy <= 0:
-        return False
-    elif accuracy >= 100:
-        return True
-    hit = random.choice([True] * accuracy + [False] * (100 - accuracy))
-    if hit:
-        return True
-    else:
-        return False
+    return dice_check(accuracy)
 
 
 def infiltrated(damage):

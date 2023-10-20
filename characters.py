@@ -153,6 +153,8 @@ class Character(Combatant):
             else:
                 hits = 1
             damage += attack.damage * hits
+            if target.has_status('Infiltrated'):
+                damage = combat.infiltrated(damage)
             print(f"{target.name} took {damage} damage!")
             target.take_damage(damage)
         if attack.healing:
@@ -160,10 +162,10 @@ class Character(Combatant):
         if attack.inflicts:
             target.add_status(attack.inflicts)
             # Dirty hack for Resonance
-            if status.name == "Resonance":
+            if attack.inflicts.name == "Resonance":
                 print(f"{self.name}'s attack leaves a resonating aura around {target.name}!")
             # Dirty hack for Harvest Moon
-            if status.name == "Harvest Moon":
+            if attack.inflicts.name == "Harvest Moon":
                 print(f"{self.name}'s attack and accuracy rose!")
         print('\n')
         return True

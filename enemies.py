@@ -39,22 +39,33 @@ class Enemy(Combatant):
                     continue
                 print(f'Status : {name} , Description : {status.description} , Turns Remaining : {status.count}\n')
 
-    def attack(self, target: Combatant):
+    def attack(self, target: Combatant) -> bool:
         """Attacks a target using one of its attacks.
+        Returns True if the attack succeeded, otherwise False.
         """
+        damage = 0
         attack = random.choice(self.attacks)
         if not attack:
             print(f"{self.name} has no attacks available!")
             return
-        if combat.accuracy(attack.accuracy, self, target):
-            print(f"{self.name} used {attack.name} on {target.name}!")
-            damage = attack.damage
+        print(f"{self.name} used {attack.name} on {target.name}!")
+        # If attack has accuracy, determine if attack misses
+        if attack.accuracy and not combat.accuracy(attack.accuracy, self, target):
+            print('The attack missed!')
+            return False
+        # Attack hits
+        if attack.damage:
+            if attack.repeats:
+                lower, upper = attack.repeats
+                hits = random.randint(lower, upper)
+                print(f'{target.name} was hit {hits} times!')
+            else:
+                hits = 1
+            damage += attack.damage * hits
             if target.has_status('Infiltrated'):
                 damage = combat.infiltrated(damage)
+            print(f"{target.name} took {damage} damage!")
             target.take_damage(damage)
-            print(f'{target.name} took {damage} damage.')
-        else:
-            print('The attack missed!')
         print('\n')
 
 

@@ -149,9 +149,6 @@ class MUDGame:
                 #prompt movement
                 self.current_room.display_room()
                 move = self.current_room.grid.prompt_movement()
-                while move not in ['w', 'a', 's', 'd', 'inventory']:
-                    print(f"Type w, a, s or d or 'inventory'. Got {move}.\n")
-                    move = self.current_room.grid.prompt_movement()
                 #Opening inventory
                 if move == 'inventory':
                     self.player1.display_inventory()

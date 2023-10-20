@@ -3,6 +3,7 @@ import random
 import time
 
 import enemies
+import text
 
 class Item:
     """Encapsulates items in the game."""
@@ -267,10 +268,17 @@ class Grid:
         """Prompt the user for a movement and return the direction to move.
         Also, to view inventory, user types open inventory
         """
-        print("Type 'wasd' to move, open the inventory by typing 'inventory'")
-        action = input('Type an action: ')
-        print('--------------------------------------------------------')
-        return action.lower()
+        options = ['w', 'a', 's', 'd', 'inventory']
+        index = text.prompt_valid_choice(
+            options=options,
+            inline=True,
+            cancel=False,
+            prelude="Type 'wasd' to move, open the inventory by typing 'inventory'",
+            prompt="Type an action"
+        )
+        # print('--------------------------------------------------------')
+        assert index is not None
+        return options[index]
         
     def move(self, position : list):
         """Update user position and coordinates in the room"""

@@ -1,5 +1,6 @@
 import random
 
+from attacks import Attack
 import attacks
 import combat
 from common import Combatant
@@ -24,14 +25,13 @@ class Character(Combatant):
     prompt_check(str): Allows user to check the stats of party or enemy
     prompt_attack(): Prompts the user to choose an attack to use
     attack(str): Attacks a target using one of its attacks
-    passive(str): Increases damage by a multiplier under certain conditions 
     get_stats(str): Displays a character's stats
      
     """
     def __init__(self,
                  name: str,
                  health: int,
-                 attacks: list["Attack"],
+                 attacks: list[Attack],
                  inventory: data.Inventory):
         self.name = name
         self.health = health
@@ -122,14 +122,14 @@ class Character(Combatant):
     def prompt_attack(self) -> int | str:
         """Prompts the user to choose an attack to use"""
         choice = text.prompt_valid_choice(
-            self.attacks,
+            [a.name for a in self.attacks],
             cancel=True,
             prelude=f"{self.name}'s Attacks:",
             prompt="Select an attack to use",
         )
         return 'back' if choice is None else choice
 
-    def attack(self, target: "Enemy", atk: str) -> bool:
+    def attack(self, target: Combatant, atk: str) -> bool:
         """Attacks a target using one of its attacks.
         Returns True if the attack succeeded, otherwise False.
         """
@@ -170,7 +170,7 @@ class Character(Combatant):
         print('\n')
         return True
 
-    def passive(self, target) -> int:
+    def passive(self, target: Combatant) -> int:
         """Subclasses must implement this method."""
         raise NotImplementedError
 
@@ -209,7 +209,7 @@ class Freddy(Character):
             inventory
         )
             
-    def passive(self, target: "Enemy"):
+    def passive(self, target: Combatant):
         """Increases damage if target is asleep"""
         if target.has_status('Sleeping'):
             return 5
@@ -297,7 +297,7 @@ class Foxy(Character):
         Increases damage by 30% if Foxy has less than half health
         """
         if self.health < 50:
-            damage = instinct(damage)
+            damage = combat.instinct(damage)
             return damage
         else:
             return 0
@@ -370,7 +370,7 @@ class Chica(Character):
         """
         If cupcake is present, heals Chica for 10 each turn. When cupcake is destroyed, deals 20 damage to targetted opponent
         """
-        if self.cupcake != None:
+        if self.cupcake is not None:
             target.take_damage(20)
             print(f'The cupcake exploded and dealt 20 damage to {target.name}!')
         else:

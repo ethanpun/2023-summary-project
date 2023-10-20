@@ -88,6 +88,10 @@ class BB(Enemy):
 class Springtrap(Enemy):
     """The boss that the player has to defeat in order to win.
 
+    Attributes:
+    next_phase (Enemy | None)
+      The next phase of the boss
+    
     Methods:
     encounter(): Displays dialogue when encountering Springtrap
     """
@@ -101,11 +105,10 @@ class Springtrap(Enemy):
                 attacks.get("Eternal Torment"),
             ],
         )
+        self.next_phase = Glitchtrap
 
     def encounter(self):
-        """
-        Plays dialogue when encountering Springtrap, notifying the player.
-        """
+        """Plays dialogue when encountering Springtrap, notifying the player."""
         print('You notice the pungent smell of decaying matter.')
         time.sleep(2)
         print(
@@ -170,28 +173,25 @@ class Glitchtrap(Enemy):
             ],
         )
 
-    def spawn():
-        """
-        Turns Springtrap into Glitchtrap, initialising phase 2
-        """
-        if Springtrap.health <= 0:
-            print('Or has he?')
-            time.sleep(2)
-            print(
-                'Springtrap: Did you really think this would be enough to finish me?'
-            )
-            time.sleep(2)
-            print(
-                'Springtrap: I am the embodiment of your fears and uncertainties, now merged and given form.'
-            )
-            time.sleep(3)
-            print('Springtrap: A glitch in the system, a fracture in reality. Witness the merging of two worlds.')
-            time.sleep(3)
-            print(
-                'You watch as the decaying bunny is encapsulated in digital code, turning him into another bunny with stitches running down his sides as he chuckles.'
-            )
-            time.sleep(5)
-            print('Glitchtrap: The time of reckoning, has begun.')
+    def encounter():
+        """Turns Springtrap into Glitchtrap, initialising phase 2"""
+        print('Or has he?')
+        time.sleep(2)
+        print(
+            'Springtrap: Did you really think this would be enough to finish me?'
+        )
+        time.sleep(2)
+        print(
+            'Springtrap: I am the embodiment of your fears and uncertainties, now merged and given form.'
+        )
+        time.sleep(3)
+        print('Springtrap: A glitch in the system, a fracture in reality. Witness the merging of two worlds.')
+        time.sleep(3)
+        print(
+            'You watch as the decaying bunny is encapsulated in digital code, turning him into another bunny with stitches running down his sides as he chuckles.'
+        )
+        time.sleep(5)
+        print('Glitchtrap: The time of reckoning, has begun.')
 
     def attack(self, target):
         print(f"{self.name} attacks {target.name}!")

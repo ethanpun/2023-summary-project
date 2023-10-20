@@ -46,6 +46,7 @@ class MUDGame:
         )
         if self.current_room.is_boss():
             enemy_party = Party([self.boss])
+            self.boss.encounter()
         else:
             enemy_party = Party(self.current_room.grid.get_enemies())
         turn_order = []
@@ -96,6 +97,12 @@ class MUDGame:
             # Update character state
             else:
                 active_character.update()
+            # Upgrade boss if defeated
+            for enemy in enemy_party.members():
+                if isinstance(enemy, enemies.Springtrap) and enemy.is_defeated():
+                    enemy_party.remove(enemy.name)
+                    enemy_party.append(enemy.next_phase())
+                    enemy.encounter()
             # Check if victory or defeat
             if player_party.is_defeated():
                 self.gameOver = True
@@ -306,87 +313,3 @@ class MUDGame:
             # Combat Start
             else:
                 self.action_combat()
-            ### NOTE!!! Below code is broken
-            elif self.current_room.is_boss():
-                #Boss Fight
-                self.current_room.display_room()
-                print('Battle started.\n')
-                #Determine turn order
-                player_party = Party(
-                    player
-                    for player in (self.player1, self.player2, self.player3, self.player4)
-                    if player is not None
-                )
-                enemy_party = Party([self.boss])
-                turn_order = []
-                for player, enemy in zip_longest(player_party.members(), enemy_party.members()):
-                    if player:
-                        turn_order.append(player)
-                    if enemy:
-                        turn_order.append(enemy)
-                
-                #Combat
-                k = 0                        
-                target = None
-                while not (player_party.is_defeated() or enemy_party.is_defeated()):
-                    active_character = turn_order[(k % len(turn_order))]
-                    if active_character.has_status('Sleeping'):
-                        print(f"{active_character.name} is asleep.")
-                        k = (k + 1) % len(turn_order)
-                        continue
-                    active_character.display_turn()
-                    if active_character in enemy_list:
-                        time.sleep(1)
-                        target = random.choice(player_party.members())
-                        if active_character.has_status('Corrupted'):
-                            target = random.choice(turn_order)
-                        active_character.attack(target)
-                        target = None
-                    elif active_character in player_list:
-                        action = text.prompt_valid_choice(
-                                ACTIONS,
-                                prompt='Please choose an action',
-                                errmsg='Select a valid action.',
-                                prelude='Select one of the following actions:'
-                            )
-                        if active_character.has_status('Corrupted'):
-                            target = random.choice(turn_order)
-                            active_character.attack(target, '1')
-                            k = (k + 1) % len(turn_order)
-                            continue
-                        result = self.do_action(active_character, target, action)
-                        if isinstance(result, enemies.Enemy):
-                            target = result
-                    #Remove defeated characters
-                    for character in turn_order:
-                        if character.is_defeated():
-                            if k >= turn_order.index(character):
-                                k = k - 1
-                            print(f"{character.name} has died.")
-                            turn_order.remove(character)
-                            if character in enemy_list:
-                                enemy_list.remove(character)
-                            elif character in player_list:
-                                player_list.remove(character)
-                    # Update character state
-                    active_character.update()
-                    #Check if victory or defeat
-                    if characters.is_defeat(player_list):
-                        self.gameOver = True
-                        print("Party defeated. Looks like you'll forgotten, just like the other animatronics down here who met their demise.")
-                        break
-                    elif characters.is_victory(
-                            enemy_list) and self.boss.name == 'Springtrap':
-                        #Initiate phase 2
-                        self.boss = enemies.Glitchtrap()
-                        self.boss.spawn()
-                        enemy_list = [self.boss]
-                        turn_order.insert(1, enemy_list[0])
-                        k = 0
-                        continue
-                    elif characters.is_victory(
-                            enemy_list) and self.boss.name == 'Glitchtrap':
-                        self.gameOver = True
-                        data.Ending()
-                        break
-                    k = (k + 1) % len(turn_order)

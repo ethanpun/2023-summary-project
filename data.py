@@ -319,20 +319,6 @@ class Grid:
         self.grid[self.get_position()[0]][self.get_position()[1]] = None
 
 
-
-#Start
-def start_menu():
-    """
-    Displays start menu 
-    """
-    print('Welcome to FNAF:Reckoning!')
-    choice = input("Type 'Start' to begin: ")
-    while choice.lower() != 'start':
-        print("To begin the game, enter 'start'.")
-        choice = input("Type 'Start' to begin: ")
-    print('--------------------------------------------------------')
-
-
 with open("characters.json", "r") as f:
     char_info = json.load(f)
 

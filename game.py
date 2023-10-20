@@ -118,11 +118,9 @@ class MUDGame:
                 f'Please select a valid action. Got {action}.')
         return False
 
-    def run(self):
-        data.start_menu()
-
+    def setup(self) -> None:
         common_inventory = data.Inventory()
-        
+
         for player in ['Player 1', 'Player 2', 'Player 3', 'Player 4']:
             character = data.choose_character(player)
             valid_character_list = ['freddy', 'freddy fazbear', 'chica', 'bonnie', 'foxy', 'skip']
@@ -143,6 +141,8 @@ class MUDGame:
                 self.set_player(player, characters.Foxy(health=100, inventory=common_inventory))
             elif character == 'skip':
                 break
+
+    def run(self) -> None:
         print('The game will begin.\n')
         while not self.gameOver:
             if not self.current_room.grid.is_encounter():

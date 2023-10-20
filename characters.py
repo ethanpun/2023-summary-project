@@ -94,6 +94,14 @@ class Character(Combatant):
         print("You don't have this item.")
         return False
 
+    def get_attack(self, name: "str | None") -> Attack:
+        if not name:
+            return self.attacks[0]
+        for attack in self.attacks:
+            if attack.name == name:
+                return attack
+        raise ValueError(f"{name}: no such attack")
+
     def heal(self, amnt):
         """Restores a character's health by a certain amount."""
         self.health += amnt
@@ -119,7 +127,7 @@ class Character(Combatant):
         elif choice is None:
             return 'back'
 
-    def prompt_attack(self) -> int | str:
+    def prompt_attack(self) -> Attack | str:
         """Prompts the user to choose an attack to use"""
         choice = text.prompt_valid_choice(
             [a.name for a in self.attacks],
@@ -127,7 +135,7 @@ class Character(Combatant):
             prelude=f"{self.name}'s Attacks:",
             prompt="Select an attack to use",
         )
-        return 'back' if choice is None else choice
+        return 'back' if choice is None else self.attacks[choice]
 
     def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
         """Determines the damage to be dealt to target by attack, and returns it."""
@@ -144,12 +152,10 @@ class Character(Combatant):
         return damage
         
 
-    def attack(self, target: Combatant, atk: str) -> bool:
+    def attack(self, target: Combatant, attack: Attack) -> bool:
         """Attacks a target using one of its attacks.
         Returns True if the attack succeeded, otherwise False.
         """
-        assert atk in "123"
-        attack = self.attacks[int(atk) - 1]
         damage = self.get_attack_damage(target, attack, 0)
         print(f'{self.name} used {attack.name} on {target.name}!')
         # If attack has accuracy, determine if attack misses

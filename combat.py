@@ -1,4 +1,5 @@
 import random
+from typing import Any
 
 from common import Combatant
 
@@ -14,6 +15,22 @@ def dice_check(success: int) -> bool:
     Return: True if successful, False if unsuccessful.
     """
     return random.randint(0, 100) <= success
+
+def dice_roll(outcomes: dict[Any, int]) -> Any:
+    """Roll a dice to decide the outcome.
+
+    outcome is a dict, with the result as the key and int representing the chance (out of 100) of success as the value.
+    The sum of outcome successes must be 100.
+    """
+    assert sum(outcomes.values()) == 100
+    limit = 0
+    roll = random.randint(1, 100)
+    for result, success in outcomes.items():
+        limit += success
+        if roll <= limit:
+            return result
+    # Fallback in case total is not 100
+    return result
 
 
 #accuracy

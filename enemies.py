@@ -79,7 +79,7 @@ class Boss(Enemy):
     Methods:
     encounter(): Displays dialogue when encountering boss
     """
-    next_phase: "Boss | None" = None
+    next_phase: "type[Boss] | None" = None
 
     def encounter(self) -> None:
         raise NotImplementedError
@@ -139,39 +139,6 @@ class Springtrap(Boss):
         time.sleep(3)
         print('Springtrap.')
 
-    def attack(self, target: "Character"):
-        print(f"{self.name} attacks {target.name}!")
-        n = random.randint(1, 3)
-        if n == '1':
-            print(f'{self.name} used Phantom Mirage!')
-            self.add_status('Phantom')
-            damage = 7
-            if target.has_status('Infiltrated'):
-                damage = combat.infiltrated(damage)            
-            target.take_damage(damage)
-            print(f'{target.name} took {damage} damage.')
-        if n == '2':
-            if combat.accuracy(40, self, target) == True:
-                print(f'{self.name} used Decaying Grasp on {target.name}!')
-                damage = 30
-                if target.has_status('Infiltrated'):
-                    damage = combat.infiltrated(damage)
-                target.take_damage(damage)
-                print(f'{target.name} took {damage} damage.')
-            else:
-                print('The attack missed!')
-        if n == '3':
-            if combat.accuracy(15, self, target) == True:
-                print(f'{self.name} used Eternal Torment on {target.name}!')
-                damage = 60
-                if target.has_status('Infiltrated'):
-                    damage = combat.infiltrated(damage)
-                target.take_damage(damage)
-                print(f'{target.name} took {damage} damage.')
-            else:
-                print('The attack missed!')
-        print('\n')
-
 
 class Glitchtrap(Boss):
     """Phase 2 of Springtrap that once defeated will finish the game."""
@@ -210,49 +177,39 @@ class Glitchtrap(Boss):
 
     def attack(self, target):
         print(f"{self.name} attacks {target.name}!")
-        n = random.randint(1, 100)
-        if n > 30 and n < 60: #28% chance to use this attack
-            print(f'{self.name} used Corrupt on {target.name}!')
-            if combat.accuracy(50, self, target) == True:   
-                damage = 20
-                if target.has_status('Infiltrated'):
-                    damage = combat.infiltrated(damage)
-                target.take_damage(damage)
-                print(f"{target.name} took {damage} damage!")
-                target.add_status('Corrupted')
-                print(f"{target.name} is corrupted!")
-            else:
-                print('The attack missed!')
-        if n > 15 and n < 31: #17% chance to use this attack
-            print(f'{self.name} used Digital Infiltration on {target.name}!')
-            if combat.accuracy(30, self, target) == True:
-                target.add_status('Infiltrated')
-                print(f"{self.name} infiltrated {target.name}'s system!")
-            else:
-                print('The attack missed!')
-        if n >= 2 and n < 16: #14% chance to use this attack
-            print(f'{self.name} used System Overload on {target.name}!')
-            if combat.accuracy(40, self, target) == True:
-                damage = 40
-                if target.has_status('Infiltrated'):
-                    damage = combat.infiltrated(damage)
-                target.take_damage(self.damage) 
-                print(f"{target.name} took {damage} damage!")
-            else:
-                print('The attack missed!')
-        if n >= 60: #40% chance to use this attack
-            print(f'{self.name} used Pixel Blast on {target.name}!')
-            if combat.accuracy(70, self, target) == True:
-                damage = 15
-                if target.has_status('Infiltrated'):
-                    damage = combat.infiltrated(damage)
-                target.take_damage(self.damage)
-                print(f"{target.name} took {damage} damage!")
-            else:
-                print('The attack missed!')
-        if n == 1:  #1% chance to use this attack
+        attack = combat.dice_roll({
+            self.attacks[0]: 28,
+            self.attacks[1]: 17,
+            self.attacks[0]: 14,
+            self.attacks[0]: 40,
+            "Griddy": 1
+        })
+        if attack == "Griddy":
             print(f'{self.name} hit the Griddy!') 
             print(f'{target.name} was traumatised and stared in disgust.')
+            return True
+        if not attack:
+            print(f"{self.name} has no attacks available!")
+            return
+        damage = 0
+        print(f"{self.name} used {attack.name} on {target.name}!")
+        # If attack has accuracy, determine if attack misses
+        if attack.accuracy and not combat.accuracy(attack.accuracy, self, target):
+            print('The attack missed!')
+            return False
+        # Attack hits
+        if attack.damage:
+            if attack.repeats:
+                lower, upper = attack.repeats
+                hits = random.randint(lower, upper)
+                print(f'{target.name} was hit {hits} times!')
+            else:
+                hits = 1
+            damage += attack.damage * hits
+            if target.has_status('Infiltrated'):
+                damage = combat.infiltrated(damage)
+            print(f"{target.name} took {damage} damage!")
+            target.take_damage(damage)
         print('\n')
 
     

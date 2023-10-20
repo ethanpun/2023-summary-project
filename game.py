@@ -74,7 +74,8 @@ class MUDGame:
                 target = random.choice(player_party.members())
                 if active_character.has_status('Corrupted'):
                     target = random.choice(turn_order)
-                active_character.attack(target)
+                    attack = active_character.select_attack()
+                active_character.attack(target, attack)
                 target = None
             elif isinstance(active_character, characters.Character):
                 action = text.prompt_valid_choice(
@@ -85,7 +86,8 @@ class MUDGame:
                 )
                 if active_character.has_status('Corrupted'):
                     target = random.choice(turn_order)
-                    active_character.attack(target, 0)
+                    attack = active_character.get_attack()
+                    active_character.attack(target, attack)
                     k = (k + 1) % len(turn_order)
                     continue
 

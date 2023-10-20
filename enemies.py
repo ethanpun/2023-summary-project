@@ -209,9 +209,8 @@ class Glitchtrap(Boss):
             damage = combat.infiltrated(damage)
         return damage
 
-    def attack(self, target):
+    def attack(self, target: Combatant, attack: Attack):
         print(f"{self.name} attacks {target.name}!")
-        attack = self.select_attack()
         if attack == "Griddy":
             print(f'{self.name} hit the Griddy!') 
             print(f'{target.name} was traumatised and stared in disgust.')

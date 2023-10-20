@@ -34,16 +34,76 @@ class MUDGame:
         elif player == 'Player 4':
             self.player4 = character
 
-    def action_target(self) -> enemies.Enemy:
-        """Select an enemy in the room to target."""
-        enemy_list = self.current_room.grid.get_enemies()
-        choice = text.prompt_valid_choice(
-            enemy_list,
-            prompt='Choose an enemy to target',
-            errmsg='Enter a number corresponding to the surviving enemies.'
+    def action_combat(self) -> None:
+        """Initiate combat in current room"""
+        self.current_room.display_room()
+        print('Battle started.\n')
+        #Determine turn order
+        player_party = Party(
+            [player
+            for player in (self.player1, self.player2, self.player3, self.player4)
+            if player is not None]
         )
-        target = enemy_list[choice]
-        return target
+        enemy_party = Party(self.current_room.grid.get_enemies())
+        turn_order = []
+        for player, enemy in zip_longest(player_party.members(), enemy_party.members()):
+            if player:
+                 turn_order.append(player)
+            if enemy:
+                 turn_order.append(enemy)
+
+        # Combat
+        k = 0                        
+        target = None
+        while not (player_party.is_defeated() or enemy_party.is_defeated()):
+            active_character = turn_order[(k % len(turn_order))]
+            if active_character.is_defeated():
+                k = (k + 1) % len(turn_order)
+                continue
+            if active_character.has_status('Sleeping'):
+                print(f"{active_character.name} is asleep.")
+                k = (k + 1) % len(turn_order)
+                continue
+            active_character.display_turn()
+            if isinstance(active_character, enemies.Enemy):
+                time.sleep(1)
+                target = random.choice(player_party.members())
+                if active_character.has_status('Corrupted'):
+                    target = random.choice(turn_order)
+                active_character.attack(target)
+                target = None
+            elif isinstance(active_character, characters.Character):
+                action = text.prompt_valid_choice(
+                    ACTIONS,
+                    prompt='Please choose an action',
+                    errmsg='Select a valid action.',
+                    prelude='Select one of the following actions:'
+                )
+                if active_character.has_status('Corrupted'):
+                    target = random.choice(turn_order)
+                    active_character.attack(target, 0)
+                    k = (k + 1) % len(turn_order)
+                    continue
+
+                result = self.do_action(active_character, target, action)
+                if isinstance(result, enemies.Enemy):
+                    target = result
+            if active_character.is_defeated():
+                print(f"{active_character.name} has died.")
+            # Update character state
+            else:
+                active_character.update()
+            # Check if victory or defeat
+            if player_party.is_defeated():
+                self.gameOver = True
+                print("Party defeated. Looks like you'll forgotten, just like the other animatronics down here who met their demise.")
+                break
+            elif enemy_party.is_defeated():
+                print('Encounter survived.')
+                self.current_room.grid.clear_tile()
+                break
+            # Next Turn
+            k = (k + 1) % len(turn_order)
 
     def action_inventory(self) -> None:
         """Display common inventory"""
@@ -214,77 +274,17 @@ class MUDGame:
             self.player1.add_item(item)
             self.current_room.grid.clear_tile()
 
-    def action_combat(self) -> None:
-        """Initiate combat in current room"""
-        self.current_room.display_room()
-        print('Battle started.\n')
-        #Determine turn order
-        player_party = Party(
-            [player
-            for player in (self.player1, self.player2, self.player3, self.player4)
-            if player is not None]
+    def action_target(self) -> enemies.Enemy:
+        """Select an enemy in the room to target."""
+        enemy_list = self.current_room.grid.get_enemies()
+        choice = text.prompt_valid_choice(
+            enemy_list,
+            prompt='Choose an enemy to target',
+            errmsg='Enter a number corresponding to the surviving enemies.'
         )
-        enemy_party = Party(self.current_room.grid.get_enemies())
-        turn_order = []
-        for player, enemy in zip_longest(player_party.members(), enemy_party.members()):
-            if player:
-                 turn_order.append(player)
-            if enemy:
-                 turn_order.append(enemy)
-    
-        # Combat
-        k = 0                        
-        target = None
-        while not (player_party.is_defeated() or enemy_party.is_defeated()):
-            active_character = turn_order[(k % len(turn_order))]
-            if active_character.is_defeated():
-                k = (k + 1) % len(turn_order)
-                continue
-            if active_character.has_status('Sleeping'):
-                print(f"{active_character.name} is asleep.")
-                k = (k + 1) % len(turn_order)
-                continue
-            active_character.display_turn()
-            if isinstance(active_character, enemies.Enemy):
-                time.sleep(1)
-                target = random.choice(player_party.members())
-                if active_character.has_status('Corrupted'):
-                    target = random.choice(turn_order)
-                active_character.attack(target)
-                target = None
-            elif isinstance(active_character, characters.Character):
-                action = text.prompt_valid_choice(
-                    ACTIONS,
-                    prompt='Please choose an action',
-                    errmsg='Select a valid action.',
-                    prelude='Select one of the following actions:'
-                )
-                if active_character.has_status('Corrupted'):
-                    target = random.choice(turn_order)
-                    active_character.attack(target, 0)
-                    k = (k + 1) % len(turn_order)
-                    continue
-    
-                result = self.do_action(active_character, target, action)
-                if isinstance(result, enemies.Enemy):
-                    target = result
-            if active_character.is_defeated():
-                print(f"{active_character.name} has died.")
-            # Update character state
-            else:
-                active_character.update()
-            # Check if victory or defeat
-            if player_party.is_defeated():
-                self.gameOver = True
-                print("Party defeated. Looks like you'll forgotten, just like the other animatronics down here who met their demise.")
-                break
-            elif enemy_party.is_defeated():
-                print('Encounter survived.')
-                self.current_room.grid.clear_tile()
-                break
-            # Next Turn
-            k = (k + 1) % len(turn_order)
-    
+        target = enemy_list[choice]
+        return target
+
     def run(self) -> None:
         print('The game will begin.\n')
         while not self.gameOver:

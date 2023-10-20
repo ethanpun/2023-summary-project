@@ -45,6 +45,71 @@ class MUDGame:
         target = enemy_list[choice]
         return target
 
+    def action_inventory(self) -> None:
+        """Display common inventory"""
+        assert self.player1 is not None
+        self.player1.display_inventory()
+
+    def action_move(self, move: str) -> bool:
+        """Carry out the move in the given direction.
+        Return True if entering next room, else False.
+        """
+        # entering next room
+        if self.current_room.grid.get_position() == [
+                0, 2
+        ] and move == 'w' and self.current_room.is_next_room(move):
+            self.current_room = self.current_room.next_room(move)
+            self.current_room.grid.move([4, 2])
+            next_room = True
+        elif self.current_room.grid.get_position() == [
+                2, 0
+        ] and move == 'a' and self.current_room.is_next_room(move):
+            self.current_room = self.current_room.next_room(move)
+            self.current_room.grid.move([2, 4])
+            next_room = True
+        elif self.current_room.grid.get_position() == [
+                4, 2
+        ] and move == 's' and self.current_room.is_next_room(move):
+            self.current_room = self.current_room.next_room(move)
+            self.current_room.grid.move([0, 2])
+            next_room = True
+        elif self.current_room.grid.get_position() == [
+                2, 4
+        ] and move == 'd' and self.current_room.is_next_room(move):
+            self.current_room = self.current_room.next_room(move)
+            self.current_room.grid.move([2, 0])
+            next_room = True
+
+        # moving in current room
+        elif move == 'w' and self.current_room.grid.get_position(
+        )[0] != 0:
+            current_position = self.current_room.grid.get_position()
+            current_position[0] = current_position[0] - 1
+            self.current_room.grid.move(current_position)
+            next_room = False
+        elif move == 's' and self.current_room.grid.get_position(
+        )[0] != 4:
+            current_position = self.current_room.grid.get_position()
+            current_position[0] = current_position[0] + 1
+            self.current_room.grid.move(current_position)
+            next_room = False
+        elif move == 'a' and self.current_room.grid.get_position(
+        )[1] != 0:
+            current_position = self.current_room.grid.get_position()
+            current_position[1] = current_position[1] - 1
+            self.current_room.grid.move(current_position)
+            next_room = False
+        elif move == 'd' and self.current_room.grid.get_position(
+        )[1] != 4:
+            current_position = self.current_room.grid.get_position()
+            current_position[1] = current_position[1] + 1
+            self.current_room.grid.move(current_position)
+            next_room = False
+        else:
+            # unreachable; throw AssertionError if reached
+            raise AssertionError
+        return next_room
+
     def action_item(self, actor: characters.Character) -> bool:
         """Prompt player for an item to use, and use it"""
         is_use = actor.is_use_item()
@@ -142,138 +207,103 @@ class MUDGame:
             elif character == 'skip':
                 break
 
+    def action_pickup(self) -> None:
+        """Pick up items in current room"""
+        if self.current_room.grid.is_item():
+            item = self.current_room.grid.get_item()
+            self.player1.add_item(item)
+            self.current_room.grid.clear_tile()
+
+    def action_combat(self) -> None:
+        """Initiate combat in current room"""
+        self.current_room.display_room()
+        print('Battle started.\n')
+        #Determine turn order
+        player_party = Party(
+            [player
+            for player in (self.player1, self.player2, self.player3, self.player4)
+            if player is not None]
+        )
+        enemy_party = Party(self.current_room.grid.get_enemies())
+        turn_order = []
+        for player, enemy in zip_longest(player_party.members(), enemy_party.members()):
+            if player:
+                 turn_order.append(player)
+            if enemy:
+                 turn_order.append(enemy)
+    
+        # Combat
+        k = 0                        
+        target = None
+        while not (player_party.is_defeated() or enemy_party.is_defeated()):
+            active_character = turn_order[(k % len(turn_order))]
+            if active_character.is_defeated():
+                k = (k + 1) % len(turn_order)
+                continue
+            if active_character.has_status('Sleeping'):
+                print(f"{active_character.name} is asleep.")
+                k = (k + 1) % len(turn_order)
+                continue
+            active_character.display_turn()
+            if isinstance(active_character, enemies.Enemy):
+                time.sleep(1)
+                target = random.choice(player_party.members())
+                if active_character.has_status('Corrupted'):
+                    target = random.choice(turn_order)
+                active_character.attack(target)
+                target = None
+            elif isinstance(active_character, characters.Character):
+                action = text.prompt_valid_choice(
+                    ACTIONS,
+                    prompt='Please choose an action',
+                    errmsg='Select a valid action.',
+                    prelude='Select one of the following actions:'
+                )
+                if active_character.has_status('Corrupted'):
+                    target = random.choice(turn_order)
+                    active_character.attack(target, 0)
+                    k = (k + 1) % len(turn_order)
+                    continue
+    
+                result = self.do_action(active_character, target, action)
+                if isinstance(result, enemies.Enemy):
+                    target = result
+            if active_character.is_defeated():
+                print(f"{active_character.name} has died.")
+            # Update character state
+            else:
+                active_character.update()
+            # Check if victory or defeat
+            if player_party.is_defeated():
+                self.gameOver = True
+                print("Party defeated. Looks like you'll forgotten, just like the other animatronics down here who met their demise.")
+                break
+            elif enemy_party.is_defeated():
+                print('Encounter survived.')
+                self.current_room.grid.clear_tile()
+                break
+            # Next Turn
+            k = (k + 1) % len(turn_order)
+    
     def run(self) -> None:
         print('The game will begin.\n')
         while not self.gameOver:
             if not self.current_room.grid.is_encounter():
-                #prompt movement
+                # Prompt movement
                 self.current_room.display_room()
                 move = self.current_room.grid.prompt_movement()
-                #Opening inventory
                 if move == 'inventory':
-                    self.player1.display_inventory()
-                    continue
-                #entering next room
-                if self.current_room.grid.get_position() == [
-                        0, 2
-                ] and move == 'w' and self.current_room.is_next_room(move):
-                    self.current_room = self.current_room.next_room(move)
-                    self.current_room.grid.move([4, 2])
-                    continue
-                elif self.current_room.grid.get_position() == [
-                        2, 0
-                ] and move == 'a' and self.current_room.is_next_room(move):
-                    self.current_room = self.current_room.next_room(move)
-                    self.current_room.grid.move([2, 4])
-                    continue
-                elif self.current_room.grid.get_position() == [
-                        4, 2
-                ] and move == 's' and self.current_room.is_next_room(move):
-                    self.current_room = self.current_room.next_room(move)
-                    self.current_room.grid.move([0, 2])
-                    continue
-                elif self.current_room.grid.get_position() == [
-                        2, 4
-                ] and move == 'd' and self.current_room.is_next_room(move):
-                    self.current_room = self.current_room.next_room(move)
-                    self.current_room.grid.move([2, 0])
-                    continue
-                #moving in current room
-                if move == 'w' and self.current_room.grid.get_position(
-                )[0] != 0:
-                    current_position = self.current_room.grid.get_position()
-                    current_position[0] = current_position[0] - 1
-                    self.current_room.grid.move(current_position)
-                elif move == 's' and self.current_room.grid.get_position(
-                )[0] != 4:
-                    current_position = self.current_room.grid.get_position()
-                    current_position[0] = current_position[0] + 1
-                    self.current_room.grid.move(current_position)
-                elif move == 'a' and self.current_room.grid.get_position(
-                )[1] != 0:
-                    current_position = self.current_room.grid.get_position()
-                    current_position[1] = current_position[1] - 1
-                    self.current_room.grid.move(current_position)
-                elif move == 'd' and self.current_room.grid.get_position(
-                )[1] != 4:
-                    current_position = self.current_room.grid.get_position()
-                    current_position[1] = current_position[1] + 1
-                    self.current_room.grid.move(current_position)
-                #Picking up items
-                if self.current_room.grid.is_item():
-                    item = self.current_room.grid.get_item()
-                    self.player1.add_item(item)
-                    self.current_room.grid.clear_tile()
-            #Combat Start
-            elif self.current_room.grid.is_encounter():
-                self.current_room.display_room()
-                print('Battle started.\n')
-                #Determine turn order
-                player_party = Party(
-                    [player
-                    for player in (self.player1, self.player2, self.player3, self.player4)
-                    if player is not None]
-                )
-                enemy_party = Party(self.current_room.grid.get_enemies())
-                turn_order = []
-                for player, enemy in zip_longest(player_party.members(), enemy_party.members()):
-                    if player:
-                         turn_order.append(player)
-                    if enemy:
-                         turn_order.append(enemy)
-
-                #Combat
-                k = 0                        
-                target = None
-                while not (player_party.is_defeated() or enemy_party.is_defeated()):
-                    active_character = turn_order[(k % len(turn_order))]
-                    if active_character.is_defeated():
-                        k = (k + 1) % len(turn_order)
-                        continue
-                    if active_character.has_status('Sleeping'):
-                        print(f"{active_character.name} is asleep.")
-                        k = (k + 1) % len(turn_order)
-                        continue
-                    active_character.display_turn()
-                    if isinstance(active_character, enemies.Enemy):
-                        time.sleep(1)
-                        target = random.choice(player_party.members())
-                        if active_character.has_status('Corrupted'):
-                            target = random.choice(turn_order)
-                        active_character.attack(target)
-                        target = None
-                    elif isinstance(active_character, characters.Character):
-                        action = text.prompt_valid_choice(
-                            ACTIONS,
-                            prompt='Please choose an action',
-                            errmsg='Select a valid action.',
-                            prelude='Select one of the following actions:'
-                        )
-                        if active_character.has_status('Corrupted'):
-                            target = random.choice(turn_order)
-                            active_character.attack(target, 0)
-                            k = (k + 1) % len(turn_order)
-                            continue
-
-                        result = self.do_action(active_character, target, action)
-                        if isinstance(result, enemies.Enemy):
-                            target = result
-                    if active_character.is_defeated():
-                        print(f"{active_character.name} has died.")
-                    #Update character state
-                    else:
-                        active_character.update()
-                    #Check if victory or defeat
-                    if player_party.is_defeated():
-                        self.gameOver = True
-                        print("Party defeated. Looks like you'll forgotten, just like the other animatronics down here who met their demise.")
-                        break
-                    elif enemy_party.is_defeated():
-                        print('Encounter survived.')
-                        self.current_room.grid.clear_tile()
-                        break
-                    #Next Turn
-                    k = (k + 1) % len(turn_order)
+                    # Opening inventory
+                    self.action_inventory()
+                else:
+                    self.action_move(move)
+                    # Picking up items
+                    self.action_pickup()
+    
+            # Combat Start
+            else:
+                self.action_combat()
+            ### NOTE!!! Below code is broken
             elif self.current_room.is_boss():
                 #Boss Fight
                 self.current_room.display_room()

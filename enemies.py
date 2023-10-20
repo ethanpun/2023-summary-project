@@ -40,6 +40,11 @@ class Enemy(Combatant):
                     continue
                 print(f'Status : {name} , Description : {status.description} , Turns Remaining : {status.count}\n')
 
+    def select_attack(self) -> Attack:
+        """Select an attack to use in combat"""
+        attack = random.choice(self.attacks)
+        return attack
+
     def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
         """Determines the damage to be dealt to target by attack, and returns it."""
         if not attack.damage:
@@ -56,7 +61,7 @@ class Enemy(Combatant):
         """Attacks a target using one of its attacks.
         Returns True if the attack succeeded, otherwise False.
         """
-        attack = random.choice(self.attacks)
+        attack = self.select_attack()
         if not attack:
             print(f"{self.name} has no attacks available!")
             return False
@@ -187,6 +192,17 @@ class Glitchtrap(Boss):
         time.sleep(5)
         print('Glitchtrap: The time of reckoning, has begun.')
 
+    def select_attack(self) -> Attack | str:
+        """Select an attack to use in combat"""
+        attack = combat.dice_roll({
+            self.attacks[0]: 28,
+            self.attacks[1]: 17,
+            self.attacks[2]: 14,
+            self.attacks[3]: 40,
+            "Griddy": 1
+        })
+        return attack
+
     def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
         damage = self.get_attack_damage(target, attack)
         if target.has_status('Infiltrated'):
@@ -195,13 +211,7 @@ class Glitchtrap(Boss):
 
     def attack(self, target):
         print(f"{self.name} attacks {target.name}!")
-        attack = combat.dice_roll({
-            self.attacks[0]: 28,
-            self.attacks[1]: 17,
-            self.attacks[0]: 14,
-            self.attacks[0]: 40,
-            "Griddy": 1
-        })
+        attack = self.select_attack()
         if attack == "Griddy":
             print(f'{self.name} hit the Griddy!') 
             print(f'{target.name} was traumatised and stared in disgust.')

@@ -99,7 +99,7 @@ class MUDGame:
                 active_character.update()
             # Upgrade boss if defeated
             for enemy in enemy_party.members():
-                if isinstance(enemy, enemies.Boss) and enemy.is_defeated():
+                if isinstance(enemy, enemies.Boss) and enemy.is_defeated() and enemy.next_phase:
                     enemy_party.remove(enemy.name)
                     enemy_party.append(enemy.next_phase())
                     enemy.encounter()

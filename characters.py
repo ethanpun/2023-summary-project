@@ -137,6 +137,17 @@ class Character(Combatant):
         )
         return 'back' if choice is None else self.attacks[choice]
 
+    def select_target(self, combatants: list[Combatant]) -> Combatant:
+        """Prompt user to select target"""
+        choice = text.prompt_valid_choice(
+            [c.name for c in combatants],
+            prompt='Choose a target',
+            errmsg='Enter a number corresponding to target.'
+        )
+        assert choice is not None
+        target = combatants[choice]
+        return target
+
     def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
         """Determines the damage to be dealt to target by attack, and returns it."""
         if not attack.damage:

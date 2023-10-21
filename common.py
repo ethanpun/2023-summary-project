@@ -134,6 +134,10 @@ class Combatant:
         """
         raise NotImplementedError
 
+    def select_target(self, combatants: list["Combatant"]) -> "Combatant":
+        """Select a target to attack"""
+        raise NotImplementedError
+
     def update(self) -> None:
         """Updates character state at end of turn."""
         for name, status in self.status.items():

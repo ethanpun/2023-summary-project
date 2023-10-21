@@ -46,6 +46,10 @@ class Enemy(Combatant):
         attack = random.choice(self.attacks)
         return attack
 
+    def select_target(self, combatants: list[Combatant]) -> Combatant:
+        """Return AI-selected target"""
+        return random.choice(combatants)
+        
     def get_attack_damage(self, target: Combatant, attack: Attack, damage: int = 0) -> int:
         """Determines the damage to be dealt to target by attack, and returns it."""
         if not attack.damage:

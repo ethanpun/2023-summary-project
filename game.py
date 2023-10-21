@@ -102,7 +102,7 @@ class MUDGame:
             for enemy in enemy_party.members():
                 if isinstance(enemy, enemies.Boss) and enemy.is_defeated() and enemy.next_phase:
                     enemy_party.remove(enemy.name)
-                    enemy_party.append(enemy.next_phase())
+                    enemy_party.append(enemy.next_phase(enemy.name, enemy.health, enemy.attacks))
                     enemy.encounter()
             # Check if victory or defeat
             if player_party.is_defeated():

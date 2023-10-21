@@ -87,6 +87,7 @@ class Combatant:
     has_status(str): If combatant has status, returns True, else returns False.
     update(): Updates combatant state after one turn
     """
+    attacks: list[Attack]
     def __init__(self,
          name: str,
          health: int,
@@ -127,6 +128,14 @@ class Combatant:
     def select_attack(self) -> Attack:
         """Select an attack to use in combat"""
         raise NotImplementedError
+
+    def get_attack(self, name: "str | None") -> Attack:
+        if not name:
+            return self.attacks[0]
+        for attack in self.attacks:
+            if attack.name == name:
+                return attack
+        raise ValueError(f"{name}: no such attack")
 
     def attack(self, target: "Combatant", attack: Attack) -> bool:
         """Attacks a target using one of its attacks.

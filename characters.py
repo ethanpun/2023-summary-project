@@ -94,14 +94,6 @@ class Character(Combatant):
         print("You don't have this item.")
         return False
 
-    def get_attack(self, name: "str | None") -> Attack:
-        if not name:
-            return self.attacks[0]
-        for attack in self.attacks:
-            if attack.name == name:
-                return attack
-        raise ValueError(f"{name}: no such attack")
-
     def heal(self, amnt):
         """Restores a character's health by a certain amount."""
         self.health += amnt

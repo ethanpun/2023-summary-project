@@ -9,7 +9,7 @@ import enemies
 import text
 
 
-ACTIONS = ["Attack", "Target", "Stats", "Item"]
+ACTIONS = ["Attack", "Stats", "Item"]
 
 
 class MUDGame:
@@ -68,31 +68,26 @@ class MUDGame:
                 print(f"{active_character.name} is asleep.")
                 k = (k + 1) % len(turn_order)
                 continue
+            if active_character.has_status('Corrupted'):
+                target = random.choice(turn_order)
+                attack = active_character.get_attack()
+                active_character.attack(target, attack)
+                continue
             active_character.display_turn()
             if isinstance(active_character, enemies.Enemy):
-                target = random.choice(player_party.members())
-                if active_character.has_status('Corrupted'):
-                    target = random.choice(turn_order)
-                    attack = active_character.get_attack()
+                target = active_character.select_target(player_party.members())
+                attack = active_character.get_attack()
                 active_character.attack(target, attack)
-                target = None
             elif isinstance(active_character, characters.Character):
-                action = text.prompt_valid_choice(
+                choice = text.prompt_valid_choice(
                     ACTIONS,
                     prompt='Please choose an action',
                     errmsg='Select a valid action.',
                     prelude='Select one of the following actions:'
                 )
-                if active_character.has_status('Corrupted'):
-                    target = random.choice(turn_order)
-                    attack = active_character.get_attack()
-                    active_character.attack(target, attack)
-                    k = (k + 1) % len(turn_order)
-                    continue
-
-                result = self.do_action(active_character, target, action)
-                if isinstance(result, enemies.Enemy):
-                    target = result
+                assert choice is not None
+                action = ACTIONS[choice].lower()
+                result = self.do_action(active_character, enemy_party, action)
             if active_character.is_defeated():
                 print(f"{active_character.name} has died.")
             # Update character state
@@ -226,28 +221,21 @@ class MUDGame:
                 ally.get_stats()
         return True
 
-    def do_action(self, actor: characters.Character, target: "enemies.Enemy | None", action) -> "bool | enemies.Enemy":
+    def do_action(self, actor: characters.Character, enemy_party, action) -> bool:
         """Carry out the selected action by the actor on the target.
         Return True if successfully carried out, False otherwise.
         (e.g. if player cancels action)
-
-        Special case: if a target is chosen,
-        returns the target (to be deprecated in future)
         """
-        assert target is not None
-        if action == 'attack' or action == 0:
+        if action == 'attack':
             attack = actor.select_attack()
             if attack == 'back':
                 return False
-            else:
-                actor.attack(target, attack)
-        elif action.lower() == 'target' or action == 1:
-            # TODO: keep track of target
-            target = self.action_target()
-            return target
-        elif action.lower() == 'check' or action == 2:
+            target = actor.select_target(enemy_party)
+            assert not isinstance(attack, str)
+            actor.attack(target, attack)
+        elif action == 'check':
             return self.action_check(actor)
-        elif action.lower() == 'item' or action == 3:
+        elif action.lower() == 'item':
             return self.action_item(actor)
         else:
             print(

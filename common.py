@@ -129,7 +129,7 @@ class Combatant:
         """Select an attack to use in combat"""
         raise NotImplementedError
 
-    def get_attack(self, name: "str | None") -> Attack:
+    def get_attack(self, name: "str | None" = None) -> Attack:
         if not name:
             return self.attacks[0]
         for attack in self.attacks:

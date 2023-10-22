@@ -34,6 +34,25 @@ class MUDGame:
         elif player == 'Player 4':
             self.player4 = character
 
+    def action_check(self, actor: characters.Character) -> bool:
+        """Prompt player for stats to check, and display requested stats"""
+        check = actor.prompt_check()
+        if check == 'back':
+            return False
+        elif check == 'enemy':
+            enemy_list = self.current_room.grid.get_enemies()
+            for enemy in enemy_list:
+                enemy.get_stats()
+        elif check == 'party':
+            player_list = [
+                player
+                for player in (self.player1, self.player2, self.player3, self.player4)
+                if player is not None
+            ]
+            for ally in player_list:
+                ally.get_stats()
+        return True
+
     def action_combat(self) -> None:
         """Initiate combat in current room"""
         self.current_room.display_room()
@@ -116,6 +135,32 @@ class MUDGame:
         assert self.player1 is not None
         self.player1.display_inventory()
 
+    def action_item(self, actor: characters.Character) -> bool:
+        """Prompt player for an item to use, and use it"""
+        is_use = actor.is_use_item()
+        if is_use == 'n':
+            return False
+        # Assume yes
+        items = [
+            item.report()
+            for item in actor.inventory.items()
+        ]
+        choice = text.prompt_valid_choice(
+            items,
+            cancel=True,
+            prompt="Choose an item to use",
+            errmsg="Invalid item",
+            prelude="Inventory:",
+        )
+        if not choice:
+            return False
+        item = items[choice]
+        print('')
+        used = actor.use_item(item)
+        if not used:
+            return False
+        return True
+
     def action_move(self, move: str) -> bool:
         """Carry out the move in the given direction.
         Return True if entering next room, else False.
@@ -176,50 +221,12 @@ class MUDGame:
             raise AssertionError
         return next_room
 
-    def action_item(self, actor: characters.Character) -> bool:
-        """Prompt player for an item to use, and use it"""
-        is_use = actor.is_use_item()
-        if is_use == 'n':
-            return False
-        # Assume yes
-        items = [
-            item.report()
-            for item in actor.inventory.items()
-        ]
-        choice = text.prompt_valid_choice(
-            items,
-            cancel=True,
-            prompt="Choose an item to use",
-            errmsg="Invalid item",
-            prelude="Inventory:",
-        )
-        if not choice:
-            return False
-        item = items[choice]
-        print('')
-        used = actor.use_item(item)
-        if not used:
-            return False
-        return True
-
-    def action_check(self, actor: characters.Character) -> bool:
-        """Prompt player for stats to check, and display requested stats"""
-        check = actor.prompt_check()
-        if check == 'back':
-            return False
-        elif check == 'enemy':
-            enemy_list = self.current_room.grid.get_enemies()
-            for enemy in enemy_list:
-                enemy.get_stats()
-        elif check == 'party':
-            player_list = [
-                player
-                for player in (self.player1, self.player2, self.player3, self.player4)
-                if player is not None
-            ]
-            for ally in player_list:
-                ally.get_stats()
-        return True
+    def action_pickup(self) -> None:
+        """Pick up items in current room"""
+        if self.current_room.grid.is_item():
+            item = self.current_room.grid.get_item()
+            self.player1.add_item(item)
+            self.current_room.grid.clear_tile()
 
     def do_action(self, actor: characters.Character, enemy_party, action) -> bool:
         """Carry out the selected action by the actor on the target.
@@ -265,13 +272,6 @@ class MUDGame:
                 self.set_player(player, characters.Foxy(health=100, inventory=common_inventory))
             elif character == 'skip':
                 break
-
-    def action_pickup(self) -> None:
-        """Pick up items in current room"""
-        if self.current_room.grid.is_item():
-            item = self.current_room.grid.get_item()
-            self.player1.add_item(item)
-            self.current_room.grid.clear_tile()
 
     def run(self) -> None:
         print('The game will begin.\n')

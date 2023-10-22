@@ -273,17 +273,6 @@ class MUDGame:
             self.player1.add_item(item)
             self.current_room.grid.clear_tile()
 
-    def action_target(self) -> enemies.Enemy:
-        """Select an enemy in the room to target."""
-        enemy_list = self.current_room.grid.get_enemies()
-        choice = text.prompt_valid_choice(
-            enemy_list,
-            prompt='Choose an enemy to target',
-            errmsg='Enter a number corresponding to the surviving enemies.'
-        )
-        target = enemy_list[choice]
-        return target
-
     def run(self) -> None:
         print('The game will begin.\n')
         while not self.gameOver:

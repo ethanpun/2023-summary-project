@@ -263,22 +263,22 @@ class Grid:
         #Spawning creatures
             i = 0
             while i < 5:
-                tile_x_coord = random.randint(0, 4)
-                tile_y_coord = random.randint(0, 4)
-                if self.get_tile(tile_x_coord, tile_y_coord).is_empty():
+                x = random.randint(0, 4)
+                y = random.randint(0, 4)
+                if self.get_tile(x, y).is_empty():
                     enemy_count = random.randint(1, 3)
                     for _ in range(enemy_count):
                         Enemy_ = random.choice([GB, BB])
-                        self.get_tile(tile_x_coord, tile_y_coord).add_enemy(Enemy_())
+                        self.get_tile(x, y).add_enemy(Enemy_())
                     i = i + 1
             k = 0
         #Spawning items
             while k < 5:
-                tile_x_coord = random.randint(0, 4)
-                tile_y_coord = random.randint(0, 4)
-                if self.get_tile(tile_x_coord, tile_y_coord).is_empty():
+                x = random.randint(0, 4)
+                y = random.randint(0, 4)
+                if self.get_tile(x, y).is_empty():
                     random_item = random.choice(all_items)
-                    self.get_tile(tile_x_coord, tile_y_coord).set_item(random_item)
+                    self.get_tile(x, y).set_item(random_item)
                     k = k + 1
         self.coordinates = [x, y]
 
@@ -341,6 +341,7 @@ class Grid:
 
 with open("characters.json", "r") as f:
     char_info = json.load(f)
+
 
 def info(name: str):
     """Displays information of the playable characters"""

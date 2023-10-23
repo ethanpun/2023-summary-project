@@ -7,7 +7,6 @@ This module should not import other game modules.
 import json
 from typing import Sequence
 
-
 #Status
 statuses = []
 with open("statuses.json", "r") as f:

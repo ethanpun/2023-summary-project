@@ -3,7 +3,7 @@ import random
 from attacks import Attack
 import attacks
 import combat
-from common import Combatant
+from common import Combatant, statuses
 import data
 import text
 
@@ -38,7 +38,7 @@ class Character(Combatant):
         self.attacks = attacks
         self.status: dict[str, "combat.Status | None"] = {
             status: None
-            for status in combat.statuses
+            for status in statuses
         }
         self.item_equipped = None
         self.inventory = inventory
@@ -175,12 +175,12 @@ class Character(Combatant):
             self.heal(attack.healing)
         if attack.inflicts:
             target.add_status(attack.inflicts)
-        # Dirty hack for Resonance
-        if attack.inflicts.name == "Resonance":
-            print(f"{self.name}'s attack leaves a resonating aura around {target.name}!")
-        # Dirty hack for Harvest Moon
-        if attack.inflicts.name == "Harvest Moon":
-            print(f"{self.name}'s attack and accuracy rose!")
+            # Dirty hack for Resonance
+            if attack.inflicts == "Resonance":
+                print(f"{self.name}'s attack leaves a resonating aura around {target.name}!")
+            # Dirty hack for Harvest Moon
+            if attack.inflicts == "Harvest Moon":
+                print(f"{self.name}'s attack and accuracy rose!")
         print('\n')
         return True
 

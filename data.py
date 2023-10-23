@@ -102,7 +102,17 @@ def start_room():
 
     
 class Room:
-    def __init__(self, boss = None, type = 'normal', x = 2, y = 2, up = None, down = None, left = None, right = None, layer = 1, number = 0):
+    def __init__(self,
+                 boss=None,
+                 type='normal',
+                 x=2,
+                 y=2,
+                 up=None,
+                 down=None,
+                 left=None,
+                 right=None,
+                 layer=1,
+                 number=0):
         #next rooms
         self.boss = boss
         self.type = type
@@ -191,34 +201,23 @@ class Room:
         print(f"Room {self.number}")
 
     def is_next_room(self, next : str) -> bool:
-        if next == 'w':
-            return self.up is not None
-        elif next == 'a':
-            return self.left is not None
-        elif next == 's':
-            return self.down is not None
-        elif next == 'd':
-            return self.right is not None
-        else:
+        if next not in self._paths:
             print('It seems that this door is locked.')
+        return self._paths[next] is not None
 
     def next_room(self, next : str) -> 'Room':
-        """User moves to next room. Depending on the input, move to room above, below, left or right. Also, check if next room for given input exists.
+        """User moves to next room. Depending on the input, move to room above, below,
+        left or right.
+        Also, check if next room for given input exists.
         """
-        next = next.lower()
-        if next == 'w':
-            return self.up
-        elif next == 's':
-            return self.down
-        elif next == 'a':
-            return self.left
-        elif next == 'd':
-            return self.right
+        assert next.islower()
+        assert next in self._paths
+        room = self._paths[next]
+        assert room is not None
+        return room
         
     def current_room(self) -> 'Room':
-        """
-        Returns the current room
-        """
+        """Returns the current room"""
         return self
 
     def count_layer(self):

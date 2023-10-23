@@ -200,6 +200,12 @@ class Room:
     def display_room(self):
         print(f"Room {self.number}")
 
+    def link(self, direction: str, room: "Room") -> None:
+        assert direction in self._paths
+        assert isinstance(room, Room)
+        assert self._paths[direction] is None
+        self._paths[direction] = room
+
     def is_next_room(self, next : str) -> bool:
         if next not in self._paths:
             print('It seems that this door is locked.')

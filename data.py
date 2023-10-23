@@ -2,7 +2,7 @@ import json
 import random
 import time
 
-import enemies
+from enemies import BB, GB, Enemy, Springtrap
 import text
 
 class Item:
@@ -99,6 +99,7 @@ def start_room():
     """Instantiates a spawn room"""
     current_room = Room(type = 'start')
     return current_room
+
     
 class Room:
     def __init__(self, boss = None, type = 'normal', x = 2, y = 2, up = None, down = None, left = None, right = None, layer = 1, number = 0):
@@ -199,6 +200,7 @@ class Room:
             return self.left
         elif next == 'd':
             return self.right
+        
     def current_room(self) -> 'Room':
         """
         Returns the current room
@@ -222,43 +224,68 @@ class Room:
         """
         return self.boss
 
+
+class Tile:
+    def __init__(self):
+        self.item: "Item | None" = None
+        self.enemies: list[Enemy] = []
+
+    def __repr__(self) -> str:
+        return f"Tile(item={self.item}, enemies={self.enemies})"
+
+    def is_empty(self) -> bool:
+        return not (self.item or self.enemies)
+
+    def set_item(self, item: Item) -> None:
+        assert isinstance(item, Item)
+        self.item = item
+
+    def add_enemy(self, enemy: Enemy) -> None:
+        assert isinstance(enemy, Enemy)
+        self.enemies.append(enemy)
+
+    def clear_all(self) -> None:
+        self.item = None
+        self.enemies.clear()
+
+
 class Grid:
     def __init__(self, type, x, y):
         self.type = type
-        self.grid = [{0 : None, 1 : None, 2 : None, 3 : None, 4 : None},
-                    {0 : None, 1 : None, 2 : None, 3 : None, 4 : None},
-                    {0 : None, 1 : None, 2 : None, 3 : None, 4 : None},
-                    {0 : None, 1 : None, 2 : None, 3 : None, 4 : None},
-                    {0 : None, 1 : None, 2 : None, 3 : None, 4 : None}]
+        self.grid = [
+            [
+                Tile()
+                for _ in range(5)
+            ]
+            for _ in range(5)
+        ]
         if type == 'normal':
         #Spawning creatures
             i = 0
             while i < 5:
                 tile_x_coord = random.randint(0, 4)
                 tile_y_coord = random.randint(0, 4)
-                if self.grid[tile_x_coord][tile_y_coord] is None:
+                if self.get_tile(tile_x_coord, tile_y_coord).is_empty():
                     enemy_count = random.randint(1, 3)
-                    enemy_list = []
-                    all_enemies = [enemies.GB(),enemies.BB()]
                     for _ in range(enemy_count):
-                        enemy = random.randint(1, len(all_enemies))
-                        if enemy == 1:
-                            enemy_list.append(enemies.GB())
-                        elif enemy == 2:
-                            enemy_list.append(enemies.BB())
-                    self.grid[tile_x_coord][tile_y_coord] = {'type' : 'creature', 'creatures' : enemy_list}
+                        Enemy_ = random.choice([GB, BB])
+                        self.get_tile(tile_x_coord, tile_y_coord).add_enemy(Enemy_())
                     i = i + 1
             k = 0
         #Spawning items
             while k < 5:
                 tile_x_coord = random.randint(0, 4)
                 tile_y_coord = random.randint(0, 4)
-                if self.grid[tile_x_coord][tile_y_coord] is None:
+                if self.get_tile(tile_x_coord, tile_y_coord).is_empty():
                     random_item = random.choice(all_items)
-                    self.grid[tile_x_coord][tile_y_coord] = {'type': 'item', 'item': random_item}
+                    self.get_tile(tile_x_coord, tile_y_coord).set_item(random_item)
                     k = k + 1
         self.coordinates = [x, y]
 
+    def get_tile(self, x: int, y: int):
+        assert 0 <= x < 5
+        assert 0 <= y < 5
+        return self.grid[x][y]
         
     def get_position(self) -> list:
         """Return user position"""
@@ -284,33 +311,32 @@ class Grid:
         """Update user position and coordinates in the room"""
         self.coordinates = position
     
-    def is_encounter(self):
+    def is_encounter(self) -> bool:
         """Return true if user coordinates are currently on a creature tile."""
-        if self.grid[self.get_position()[0]][self.get_position()[1]] is None:
-            return False
-        elif self.grid[self.get_position()[0]][self.get_position()[1]]['type'] == 'creature':
-            return True
-        return False
+        x, y = self.get_position()
+        return bool(self.get_tile(x, y).enemies)
 
     def get_enemies(self):
         """Return the enemies on that tile."""
-        coordinates = self.get_position()
-        return self.grid[coordinates[0]][coordinates[1]]['creatures']
+        x, y = self.get_position()
+        return self.get_tile(x, y).enemies
+
     def is_item(self):
         """Return true if user coordinates are currently on a item tile."""
-        if self.grid[self.get_position()[0]][self.get_position()[1]] is None:
-            return False
-        elif self.grid[self.get_position()[0]][self.get_position()[1]]['type'] == 'item':
-            return True
-        return False
+        x, y = self.get_position()
+        return bool(self.get_tile(x, y).item)
             
-    def get_item(self) -> str:
+    def get_item(self) -> Item:
         """If user is on an item tile, return the item on that tile"""
-        return self.grid[self.get_position()[0]][self.get_position()[1]]['item']['name']
+        x, y = self.get_position()
+        item = self.get_tile(x, y).item
+        assert item is not None
+        return item
         
     def clear_tile(self):
         """After a defeating a creature or picking up an item, remove it from the grid"""
-        self.grid[self.get_position()[0]][self.get_position()[1]] = None
+        x, y = self.get_position()
+        self.get_tile(x, y).clear_all()
 
 
 with open("characters.json", "r") as f:

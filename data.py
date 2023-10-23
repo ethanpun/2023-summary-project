@@ -97,7 +97,7 @@ def increment_total_rooms():
 
 def start_room():
     """Instantiates a spawn room"""
-    current_room = Room(type = 'start')
+    current_room = Room(type='start')
     return current_room
 
     
@@ -147,25 +147,25 @@ class Room:
             while connections != 0:
                 next_room = random.randint(0, len(next_rooms) - 1)
                 if ref_next_rooms[next_room] == 'self.up':
-                    self.up = Room(down = self, layer=self.count_layer(), number = self.count_room())
+                    self.up = Room(down=self, layer=self.count_layer(), number=self.count_room())
                     self._paths['w'] = self.up
                     increment_total_rooms()
                     next_rooms.pop(next_room)
                     ref_next_rooms.pop(next_room)
                 elif ref_next_rooms[next_room] == 'self.down':
-                    self.down = Room(up = self, layer=self.count_layer(), number = self.count_room())
+                    self.down = Room(up=self, layer=self.count_layer(), number=self.count_room())
                     self._paths['s'] = self.down
                     increment_total_rooms()
                     next_rooms.pop(next_room)
                     ref_next_rooms.pop(next_room)
                 elif ref_next_rooms[next_room] == 'self.left':
-                    self.left = Room(right = self, layer=self.count_layer(), number = self.count_room())
+                    self.left = Room(right=self, layer=self.count_layer(), number=self.count_room())
                     self._paths['a'] = self.left
                     increment_total_rooms()
                     next_rooms.pop(next_room)
                     ref_next_rooms.pop(next_room)
                 elif ref_next_rooms[next_room] == 'self.right':
-                    self.right = Room(left = self, layer=self.count_layer(), number = self.count_room())
+                    self.right = Room(left=self, layer=self.count_layer(), number=self.count_room())
                     self._paths['d'] = self.right
                     increment_total_rooms()
                     next_rooms.pop(next_room)
@@ -175,12 +175,12 @@ class Room:
         if self.number == 7:
             next_room = random.randint(0, len(next_rooms) - 1)
             if ref_next_rooms[next_room] == 'self.up':
-                self.up = Room(down = self, type = 'boss', boss = Springtrap(), layer=self.count_layer())
+                self.up = Room(down=self, type = 'boss', boss=Springtrap(), layer=self.count_layer())
                 self._paths['w'] = self.up
                 next_rooms.pop(next_room)
                 ref_next_rooms.pop(next_room)
             elif ref_next_rooms[next_room] == 'self.down':
-                self.down = Room(up = self, type = 'boss', boss = Springtrap(), layer=self.count_layer())
+                self.down = Room(up=self, type='boss', boss=Springtrap(), layer=self.count_layer())
                 self._paths['s'] = self.down
                 next_rooms.pop(next_room)
                 ref_next_rooms.pop(next_room)
@@ -190,12 +190,12 @@ class Room:
                 next_rooms.pop(next_room)
                 ref_next_rooms.pop(next_room)
             elif ref_next_rooms[next_room] == 'self.right':
-                self.right = Room(left = self, type = 'boss', boss = Springtrap(), layer=self.count_layer())
+                self.right = Room(left=self, type='boss', boss=Springtrap(), layer=self.count_layer())
                 self._paths['d'] = self.right
                 next_rooms.pop(next_room)
                 ref_next_rooms.pop(next_room)
                 
-        self.grid = Grid(type = type, x = x, y = y)
+        self.grid = Grid(type=type, x=x, y=y)
         
     def display_room(self):
         print(f"Room {self.number}")

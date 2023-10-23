@@ -205,16 +205,13 @@ class Room:
             print('It seems that this door is locked.')
         return self._paths[next] is not None
 
-    def next_room(self, next : str) -> 'Room':
+    def next_room(self, next: str) -> 'Room | None':
         """User moves to next room. Depending on the input, move to room above, below,
         left or right.
-        Also, check if next room for given input exists.
         """
         assert next.islower()
         assert next in self._paths
-        room = self._paths[next]
-        assert room is not None
-        return room
+        return self._paths[next]
         
     def current_room(self) -> 'Room':
         """Returns the current room"""

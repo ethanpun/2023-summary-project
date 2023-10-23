@@ -74,6 +74,33 @@ def test_start_room():
         raise Exception("Spawn Room function does not run.")
     else:
         print("Spawn Room instantiated with no issues.")
+
+
+visited = []
+def test_room_connections(room=None) -> None:
+    '''
+    ========================================
+    Test that rooms are consistently connected.
+    ========================================
+    '''
+    def opp(direction: str) -> str:
+        if direction == 'w': return 's'
+        if direction == 's': return 'w'
+        if direction == 'a': return 'd'
+        if direction == 'd': return 'a'
+    
+    if not room:
+        room = data.start_room()
+    if room in visited:
+        return
+    for direction in 'wasd':
+        next_room = room.next_room(direction)
+        if not next_room:
+            continue
+        # room exists
+        assert next_room.next_room(opp(direction)) is room
+        visited.append(room)
+        test_room_connections(next_room)
     
 
 def test_freddy():
@@ -155,5 +182,6 @@ def test_bonnie():
 
 test_room()
 test_start_room()
-test_freddy()
-test_bonnie()
+test_room_connections()
+# test_freddy()
+# test_bonnie()

@@ -142,33 +142,37 @@ class Room:
             's': None,
             'd': None
         }
+        self.grid = Grid(type=type, x=x, y=y)
+        
+    def display_room(self):
+        print(f"Room {self.number}")
 
+    def grow(self, n: int) -> None:
+        """Add n rooms to current room"""
         if self.type == 'start':
             #Start Room
             room = Room(number=self.count_room())
-            self._paths['w'] = room
+            self.link('w', room)
             room.link(opp('w'), self)
+            room.grow(random.randint(2, 3))
         elif total_rooms < 10 and self.layer < 3:
             #Normal Room
-            for _ in range(random.randint(2, 3)):
+            for _ in range(n):
                 # List of directions without a linked room
                 unlinked_dirs = [dir_ for dir_, room in self._paths.items() if room is None]
                 direction = random.choice(unlinked_dirs)
                 room = Room(layer=self.count_layer(), number=self.count_room())
+                self.link(direction, room)
                 room.link(opp(direction), self)
-                self._paths[direction] = room
                 increment_total_rooms()
+                room.grow(random.randint(2, 3))
         #Boss Room
         if self.number == 7:
             unlinked_dirs = [dir_ for dir_, room in self._paths.items() if room is None]
             direction = random.choice(unlinked_dirs)
             room = Room(type='boss', boss=Springtrap(), layer=self.count_layer())
+            self.link(direction, room)
             room.link(opp(direction), self)
-            self._paths[direction] = room
-        self.grid = Grid(type=type, x=x, y=y)
-        
-    def display_room(self):
-        print(f"Room {self.number}")
 
     def link(self, direction: str, room: "Room") -> None:
         assert direction in self._paths

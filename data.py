@@ -90,18 +90,6 @@ class Inventory:
         return True
 
 
-#Rooms
-total_rooms = 0
-def increment_total_rooms():
-    global total_rooms
-    return total_rooms + 1
-
-def start_room():
-    """Instantiates a spawn room"""
-    current_room = Room(type='start')
-    return current_room
-
-
 def opp(direction: str) -> str:
     """Return the opposite direction character"""
     if direction == 'w':
@@ -118,23 +106,10 @@ def opp(direction: str) -> str:
 class Room:
     def __init__(self,
                  boss=None,
-                 type='normal',
                  x=2,
                  y=2,
-                 # up=None,
-                 # down=None,
-                 # left=None,
-                 # right=None,
-                 layer=1,
                  number=0):
-        #next rooms
         self.boss = boss
-        self.type = type
-        # self.up = up
-        # self.down = down 
-        # self.right = right
-        # self.left = left
-        self.layer = layer
         self.number = number
         self._paths: dict[str, "Room | None"] = {
             'w': None,
@@ -142,37 +117,13 @@ class Room:
             's': None,
             'd': None
         }
-        self.grid = Grid(type=type, x=x, y=y)
+        self.grid = Grid(x=x, y=y)
+        if not boss:
+            populate_enemy(self.grid, 5)
+            populate_item(self.grid, 5)
         
     def display_room(self):
         print(f"Room {self.number}")
-
-    def grow(self, n: int) -> None:
-        """Add n rooms to current room"""
-        if self.type == 'start':
-            #Start Room
-            room = Room(number=self.count_room())
-            self.link('w', room)
-            room.link(opp('w'), self)
-            room.grow(random.randint(2, 3))
-        elif total_rooms < 10 and self.layer < 3:
-            #Normal Room
-            for _ in range(n):
-                # List of directions without a linked room
-                unlinked_dirs = [dir_ for dir_, room in self._paths.items() if room is None]
-                direction = random.choice(unlinked_dirs)
-                room = Room(layer=self.count_layer(), number=self.count_room())
-                self.link(direction, room)
-                room.link(opp(direction), self)
-                increment_total_rooms()
-                room.grow(random.randint(2, 3))
-        #Boss Room
-        if self.number == 7:
-            unlinked_dirs = [dir_ for dir_, room in self._paths.items() if room is None]
-            direction = random.choice(unlinked_dirs)
-            room = Room(type='boss', boss=Springtrap(), layer=self.count_layer())
-            self.link(direction, room)
-            room.link(opp(direction), self)
 
     def link(self, direction: str, room: "Room") -> None:
         assert direction in self._paths
@@ -197,18 +148,12 @@ class Room:
         assert next in self._paths
         return self._paths[next]
         
-    def current_room(self) -> 'Room':
-        """Returns the current room"""
-        return self
-
-    def count_layer(self):
-       return self.layer + 1
-
-    def count_room(self):
-        return self.number + 1
+    # def current_room(self) -> 'Room':
+    #     """Returns the current room"""
+    #     return self
         
     def is_boss(self):
-        if self.type == 'boss':
+        if self.boss:
             return True
         return False
 
@@ -272,8 +217,7 @@ def populate_enemy(grid: "Grid", n: int) -> None:
 
 
 class Grid:
-    def __init__(self, type, x, y):
-        self.type = type
+    def __init__(self, x, y):
         self.grid = [
             [
                 Tile()
@@ -281,10 +225,6 @@ class Grid:
             ]
             for _ in range(5)
         ]
-        if type == 'normal':
-        #Spawning creatures
-            populate_enemy(self, 5)
-            populate_item(self, 5)
         self.coordinates = [x, y]
 
     def get_tile(self, x: int, y: int):

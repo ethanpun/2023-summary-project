@@ -234,6 +234,34 @@ class Tile:
         self.enemies.clear()
 
 
+def random_coord(n: int) -> tuple[int, int]:
+    x = random.randint(0, n)
+    y = random.randint(0, n)
+    return x, y
+
+def populate_item(grid: "Grid", n: int) -> None:
+    """Populate the grid with items randomly, n times"""
+    if n == 0:
+        return
+    x, y = random_coord(4)
+    while not grid.get_tile(x, y).is_empty():
+        x, y = random_coord(4)
+    random_item = random.choice(all_items)
+    grid.get_tile(x, y).set_item(random_item)
+    populate_item(grid, n - 1)
+
+def populate_enemy(grid: "Grid", n: int) -> None:
+    """Populate the grid with enemies randomly, n times"""
+    if n == 0:
+        return
+    x, y = random_coord(4)
+    while not grid.get_tile(x, y).is_empty():
+        x, y = random_coord(4)
+    Enemy_ = random.choice([GB, BB])
+    grid.get_tile(x, y).add_enemy(Enemy_())
+    populate_enemy(grid, n - 1)
+
+
 class Grid:
     def __init__(self, type, x, y):
         self.type = type
@@ -246,25 +274,8 @@ class Grid:
         ]
         if type == 'normal':
         #Spawning creatures
-            i = 0
-            while i < 5:
-                x = random.randint(0, 4)
-                y = random.randint(0, 4)
-                if self.get_tile(x, y).is_empty():
-                    enemy_count = random.randint(1, 3)
-                    for _ in range(enemy_count):
-                        Enemy_ = random.choice([GB, BB])
-                        self.get_tile(x, y).add_enemy(Enemy_())
-                    i = i + 1
-            k = 0
-        #Spawning items
-            while k < 5:
-                x = random.randint(0, 4)
-                y = random.randint(0, 4)
-                if self.get_tile(x, y).is_empty():
-                    random_item = random.choice(all_items)
-                    self.get_tile(x, y).set_item(random_item)
-                    k = k + 1
+            populate_enemy(self, 5)
+            populate_item(self, 5)
         self.coordinates = [x, y]
 
     def get_tile(self, x: int, y: int):
@@ -275,6 +286,12 @@ class Grid:
     def get_position(self) -> list:
         """Return user position"""
         return self.coordinates
+
+    def spawn(self, x: int, y: int, thing: "Enemy | Item") -> None:
+        if isinstance(thing, Item):
+            self.get_tile(x, y).set_item(thing)
+        elif isinstance(thing, Enemy):
+            self.get_tile(x, y).add_enemy(thing)
 
     def prompt_movement(self) -> str:
         """Prompt the user for a movement and return the direction to move.

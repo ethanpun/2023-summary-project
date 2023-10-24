@@ -142,16 +142,7 @@ class Room:
             's': None,
             'd': None
         }
-        connections = random.randint(2, 3)
-        next_rooms = list(self._paths.values())
-        ref_next_rooms = list(self._paths.keys())
-        i = 0
-        for _ in range(len(next_rooms)):
-            if next_rooms[i] is not None:
-                next_rooms.pop(i)
-                ref_next_rooms.pop(i)
-                i -= 1
-            i += 1
+
         if self.type == 'start':
             #Start Room
             room = Room(number=self.count_room())
@@ -159,25 +150,21 @@ class Room:
             room.link(opp('w'), self)
         elif total_rooms < 10 and self.layer < 3:
             #Normal Room
-            while connections != 0:
-                next_room = random.randint(0, len(next_rooms) - 1)
-                direction = ref_next_rooms[next_room]
+            for _ in range(random.randint(2, 3)):
+                # List of directions without a linked room
+                unlinked_dirs = [dir_ for dir_, room in self._paths.items() if room is None]
+                direction = random.choice(unlinked_dirs)
                 room = Room(layer=self.count_layer(), number=self.count_room())
                 room.link(opp(direction), self)
                 self._paths[direction] = room
                 increment_total_rooms()
-                next_rooms.pop(next_room)
-                ref_next_rooms.pop(next_room)
-                connections -= 1
         #Boss Room
         if self.number == 7:
-            next_room = random.randint(0, len(next_rooms) - 1)
-            direction = ref_next_rooms[next_room]
+            unlinked_dirs = [dir_ for dir_, room in self._paths.items() if room is None]
+            direction = random.choice(unlinked_dirs)
             room = Room(type='boss', boss=Springtrap(), layer=self.count_layer())
             room.link(opp(direction), self)
             self._paths[direction] = room
-            next_rooms.pop(next_room)
-            ref_next_rooms.pop(next_room)
         self.grid = Grid(type=type, x=x, y=y)
         
     def display_room(self):

@@ -18,7 +18,7 @@ class MUDGame:
     def __init__(self):
         # self.spawn = Room('home', up='closed')
         self.boss = enemies.Springtrap()
-        self.current_room = generate.maze()
+        self.current_room: data.Room = generate.maze()
         self.gameOver = False
         self.player1 = None
         self.player2 = None
@@ -107,7 +107,7 @@ class MUDGame:
                 )
                 assert choice is not None
                 action = ACTIONS[choice].lower()
-                result = self.do_action(active_character, enemy_party, action)
+                self.do_action(active_character, enemy_party, action)
             if active_character.is_defeated():
                 print(f"{active_character.name} has died.")
             # Update character state

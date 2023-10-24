@@ -6,6 +6,7 @@ import characters
 from combat import Party
 import data
 import enemies
+import generate
 import text
 
 
@@ -17,7 +18,7 @@ class MUDGame:
     def __init__(self):
         # self.spawn = Room('home', up='closed')
         self.boss = enemies.Springtrap()
-        self.current_room = data.start_room()
+        self.current_room = generate.maze()
         self.gameOver = False
         self.player1 = None
         self.player2 = None

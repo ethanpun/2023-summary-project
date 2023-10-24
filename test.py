@@ -6,6 +6,7 @@ import characters
 import data
 import enemies
 import game
+import generate
 
 # test = game.MUDGame()
 
@@ -90,7 +91,7 @@ def test_room_connections(room=None) -> None:
         if direction == 'd': return 'a'
     
     if not room:
-        room = data.start_room()
+        room = generate.maze()
     if room in visited:
         return
     for direction in 'wasd':

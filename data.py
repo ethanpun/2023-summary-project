@@ -178,6 +178,7 @@ class Room:
         assert direction in self._paths
         assert isinstance(room, Room)
         self._paths[direction] = room
+        room.link(opp(direction), self)
 
     def is_next_room(self, next : str) -> bool:
         if next not in self._paths:

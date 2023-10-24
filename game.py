@@ -169,25 +169,25 @@ class MUDGame:
         # entering next room
         if self.current_room.grid.get_position() == [
                 0, 2
-        ] and move == 'w' and self.current_room.is_next_room(move):
+        ] and move == 'w' and self.current_room.next_room(move):
             self.current_room = self.current_room.next_room(move)
             self.current_room.grid.move([4, 2])
             next_room = True
         elif self.current_room.grid.get_position() == [
                 2, 0
-        ] and move == 'a' and self.current_room.is_next_room(move):
+        ] and move == 'a' and self.current_room.next_room(move):
             self.current_room = self.current_room.next_room(move)
             self.current_room.grid.move([2, 4])
             next_room = True
         elif self.current_room.grid.get_position() == [
                 4, 2
-        ] and move == 's' and self.current_room.is_next_room(move):
+        ] and move == 's' and self.current_room.next_room(move):
             self.current_room = self.current_room.next_room(move)
             self.current_room.grid.move([0, 2])
             next_room = True
         elif self.current_room.grid.get_position() == [
                 2, 4
-        ] and move == 'd' and self.current_room.is_next_room(move):
+        ] and move == 'd' and self.current_room.next_room(move):
             self.current_room = self.current_room.next_room(move)
             self.current_room.grid.move([2, 0])
             next_room = True

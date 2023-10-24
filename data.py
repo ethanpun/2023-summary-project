@@ -135,11 +135,6 @@ class Room:
         if room._paths[opp(direction)] is None:
             room.link(opp(direction), self)
 
-    def is_next_room(self, next : str) -> bool:
-        if next not in self._paths:
-            print('It seems that this door is locked.')
-        return self._paths[next] is not None
-
     def next_room(self, next: str) -> 'Room | None':
         """User moves to next room. Depending on the input, move to room above, below,
         left or right.

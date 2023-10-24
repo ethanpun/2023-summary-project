@@ -66,7 +66,7 @@ def test_start_room():
     '''
     
     try:
-        test_spawn_room = data.start_room()
+        test_spawn_room = generate.maze()
         if test_spawn_room.__class__.__name__ == "Room":
             print("Spawn Room is a Room Object")
         else:

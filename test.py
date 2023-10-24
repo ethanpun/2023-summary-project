@@ -31,9 +31,9 @@ def test_room():
         test_room = data.Room()
     except:
         print("Room cannot be instantiated")
+        raise
         
     try:
-        
         if test_room.grid.get_position() != [2, 2]:
             print("Grid positioning does not work properly.")
         else:

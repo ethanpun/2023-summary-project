@@ -2,8 +2,9 @@ import json
 import random
 import time
 
-from enemies import BB, GB, Enemy, Springtrap
 import text
+from enemies import BB, GB, Enemy, Springtrap
+
 
 class Item:
     """Encapsulates items in the game."""
@@ -100,37 +101,50 @@ def start_room():
     current_room = Room(type='start')
     return current_room
 
-    
+
+def opp(direction: str) -> str:
+    """Return the opposite direction character"""
+    if direction == 'w':
+        return 's'
+    elif direction == 's':
+        return 'w'
+    elif direction == 'a':
+        return 'd'
+    elif direction == 'd':
+        return 'a'
+    raise ValueError("Invalid direction {direction!r}")
+
+
 class Room:
     def __init__(self,
                  boss=None,
                  type='normal',
                  x=2,
                  y=2,
-                 up=None,
-                 down=None,
-                 left=None,
-                 right=None,
+                 # up=None,
+                 # down=None,
+                 # left=None,
+                 # right=None,
                  layer=1,
                  number=0):
         #next rooms
         self.boss = boss
         self.type = type
-        self.up = up
-        self.down = down 
-        self.right = right
-        self.left = left
+        # self.up = up
+        # self.down = down 
+        # self.right = right
+        # self.left = left
         self.layer = layer
         self.number = number
         self._paths: dict[str, "Room | None"] = {
-            'w': up,
-            'a': left,
-            's': down,
-            'd': right
+            'w': None,
+            'a': None,
+            's': None,
+            'd': None
         }
         connections = random.randint(2, 3)
-        next_rooms = [self.up, self.down, self.left, self.right]
-        ref_next_rooms = ['self.up', 'self.down', 'self.left', 'self.right']
+        next_rooms = list(self._paths.values())
+        ref_next_rooms = list(self._paths.keys())
         i = 0
         for _ in range(len(next_rooms)):
             if next_rooms[i] is not None:
@@ -140,61 +154,30 @@ class Room:
             i += 1
         if self.type == 'start':
             #Start Room
-            self.up = Room(down = self, number = self.count_room())
-            self._paths['w'] = self.up
+            room = Room(number=self.count_room())
+            self._paths['w'] = room
+            room.link(opp('w'), self)
         elif total_rooms < 10 and self.layer < 3:
             #Normal Room
             while connections != 0:
                 next_room = random.randint(0, len(next_rooms) - 1)
-                if ref_next_rooms[next_room] == 'self.up':
-                    self.up = Room(down=self, layer=self.count_layer(), number=self.count_room())
-                    self._paths['w'] = self.up
-                    increment_total_rooms()
-                    next_rooms.pop(next_room)
-                    ref_next_rooms.pop(next_room)
-                elif ref_next_rooms[next_room] == 'self.down':
-                    self.down = Room(up=self, layer=self.count_layer(), number=self.count_room())
-                    self._paths['s'] = self.down
-                    increment_total_rooms()
-                    next_rooms.pop(next_room)
-                    ref_next_rooms.pop(next_room)
-                elif ref_next_rooms[next_room] == 'self.left':
-                    self.left = Room(right=self, layer=self.count_layer(), number=self.count_room())
-                    self._paths['a'] = self.left
-                    increment_total_rooms()
-                    next_rooms.pop(next_room)
-                    ref_next_rooms.pop(next_room)
-                elif ref_next_rooms[next_room] == 'self.right':
-                    self.right = Room(left=self, layer=self.count_layer(), number=self.count_room())
-                    self._paths['d'] = self.right
-                    increment_total_rooms()
-                    next_rooms.pop(next_room)
-                    ref_next_rooms.pop(next_room)
+                direction = ref_next_rooms[next_room]
+                room = Room(layer=self.count_layer(), number=self.count_room())
+                room.link(opp(direction), self)
+                self._paths[direction] = room
+                increment_total_rooms()
+                next_rooms.pop(next_room)
+                ref_next_rooms.pop(next_room)
                 connections -= 1
         #Boss Room
         if self.number == 7:
             next_room = random.randint(0, len(next_rooms) - 1)
-            if ref_next_rooms[next_room] == 'self.up':
-                self.up = Room(down=self, type = 'boss', boss=Springtrap(), layer=self.count_layer())
-                self._paths['w'] = self.up
-                next_rooms.pop(next_room)
-                ref_next_rooms.pop(next_room)
-            elif ref_next_rooms[next_room] == 'self.down':
-                self.down = Room(up=self, type='boss', boss=Springtrap(), layer=self.count_layer())
-                self._paths['s'] = self.down
-                next_rooms.pop(next_room)
-                ref_next_rooms.pop(next_room)
-            elif ref_next_rooms[next_room] == 'self.left':
-                self.left = Room(right = self, type = 'boss', boss = Springtrap(), layer=self.count_layer())
-                self._paths['a'] = self.left
-                next_rooms.pop(next_room)
-                ref_next_rooms.pop(next_room)
-            elif ref_next_rooms[next_room] == 'self.right':
-                self.right = Room(left=self, type='boss', boss=Springtrap(), layer=self.count_layer())
-                self._paths['d'] = self.right
-                next_rooms.pop(next_room)
-                ref_next_rooms.pop(next_room)
-                
+            direction = ref_next_rooms[next_room]
+            room = Room(type='boss', boss=Springtrap(), layer=self.count_layer())
+            room.link(opp(direction), self)
+            self._paths[direction] = room
+            next_rooms.pop(next_room)
+            ref_next_rooms.pop(next_room)
         self.grid = Grid(type=type, x=x, y=y)
         
     def display_room(self):
@@ -203,7 +186,6 @@ class Room:
     def link(self, direction: str, room: "Room") -> None:
         assert direction in self._paths
         assert isinstance(room, Room)
-        assert self._paths[direction] is None
         self._paths[direction] = room
 
     def is_next_room(self, next : str) -> bool:

@@ -176,49 +176,31 @@ class MUDGame:
         Return True if entering next room, else False.
         """
         # entering next room
-        if self.get_position() == (0, 2) and direction == 'w' and self.current_room.next_room(direction):
-            self.current_room = self.current_room.next_room(direction)
-            self.move((4, 2))
-            next_room = True
-        elif self.get_position() == (2, 0) and direction == 'a' and self.current_room.next_room(direction):
-            self.current_room = self.current_room.next_room(direction)
-            self.move((2, 4))
-            next_room = True
-        elif self.get_position() == (4, 2) and direction == 's' and self.current_room.next_room(direction):
-            self.current_room = self.current_room.next_room(direction)
-            self.move((0, 2))
-            next_room = True
-        elif self.get_position() == (2, 4) and direction == 'd' and self.current_room.next_room(direction):
-            self.current_room = self.current_room.next_room(direction)
-            self.move((2, 0))
-            next_room = True
+        next_room = None
+        coord = self.get_position()
+        if self.current_room.grid.is_exit(coord, direction):
+            next_room = self.current_room.next_room(direction)
+            if not next_room:
+                print("That door seems to be locked")
+            else:
+                self.current_room = next_room
 
-        # moving in current room
-        elif direction == 'w' and self.get_position(
-        )[0] != 0:
-            x, y = self.get_position()
-            self.move((x - 1, y))
-            next_room = False
-        elif direction == 's' and self.get_position(
-        )[0] != 4:
-            x, y = self.get_position()
-            self.move((x + 1, y))
-            next_room = False
-        elif direction == 'a' and self.get_position(
-        )[1] != 0:
-            x, y = self.get_position()
-            self.move((x, y - 1))
-            next_room = False
-        elif direction == 'd' and self.get_position(
-        )[1] != 4:
-            x, y = self.get_position()
-            self.move((x, y + 1))
-            next_room = False
-        else:
-            # unreachable; throw AssertionError if reached
-            raise AssertionError
-        return next_room
-
+        elif self.current_room.grid.is_edge(coord, direction):
+            # moving in current room
+            x, y = coord
+            if direction == 'w':
+                self.move((x - 1, y))
+            elif direction == 's':
+                self.move((x + 1, y))
+            elif direction == 'a':
+                self.move((x, y - 1))
+            elif direction == 'd':
+                self.move((x, y + 1))
+            else:
+                # unreachable; throw AssertionError if reached
+                raise AssertionError
+            return bool(next_room)
+    
     def action_pickup(self) -> None:
         """Pick up items in current room"""
         coord = self.get_position()

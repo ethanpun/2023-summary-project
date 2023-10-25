@@ -243,7 +243,36 @@ class Grid:
         # print('--------------------------------------------------------')
         assert index is not None
         return options[index]
+
+    def is_edge(self, coord: tuple[int, int], direction: str) -> bool:
+        """Returns True if the coord is at the edge of the
+        grid in the given direction, False otherwise.
+        """
+        x, y = coord
+        if direction == 'w':
+            return x > 0
+        if direction == 'a':
+            return y > 0
+        if direction == 's':
+            return x < 4
+        if direction == 'd':
+            return y < 4
+        raise AssertionError  # invalid direction
     
+    def is_exit(self, coord: tuple[int, int], direction: str) -> bool:
+        """Returns True if the coord is at the edge of the
+        grid in the given direction, False otherwise.
+        """
+        if direction == 'w':
+            return coord == (0, 2)
+        if direction == 'a':
+            return coord == (2, 0)
+        if direction == 's':
+            return coord == (4, 2)
+        if direction == 'd':
+            return coord == (2, 4)
+        raise AssertionError  # invalid direction
+
     def is_encounter(self, coord: tuple[int, int]) -> bool:
         """Return true if user coordinates are currently on a creature tile."""
         x, y = coord

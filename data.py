@@ -143,10 +143,6 @@ class Room:
         assert next in self._paths
         return self._paths[next]
         
-    # def current_room(self) -> 'Room':
-    #     """Returns the current room"""
-    #     return self
-        
     def is_boss(self):
         if self.boss:
             return True
@@ -220,16 +216,11 @@ class Grid:
             ]
             for _ in range(5)
         ]
-        # self.coordinates = [x, y]
 
     def get_tile(self, x: int, y: int):
         assert 0 <= x < 5
         assert 0 <= y < 5
         return self.grid[x][y]
-        
-    # def get_position(self) -> list:
-    #     """Return user position"""
-    #     return self.coordinates
 
     def spawn(self, x: int, y: int, thing: "Enemy | Item") -> None:
         if isinstance(thing, Item):
@@ -252,10 +243,6 @@ class Grid:
         # print('--------------------------------------------------------')
         assert index is not None
         return options[index]
-        
-    # def move(self, position : list):
-    #     """Update user position and coordinates in the room"""
-    #     self.coordinates = position
     
     def is_encounter(self, coord: tuple[int, int]) -> bool:
         """Return true if user coordinates are currently on a creature tile."""

@@ -20,10 +20,19 @@ class MUDGame:
         self.boss = enemies.Springtrap()
         self.current_room: data.Room = generate.maze()
         self.gameOver = False
+        self.coordinates = (2, 2)
         self.player1 = None
         self.player2 = None
         self.player3 = None
         self.player4 = None
+
+    def get_position(self) -> tuple[int, int]:
+        """Return user position"""
+        return self.coordinates
+
+    def move(self, coords: tuple[int, int]) -> None:
+        """Update user position and coordinates in the room"""
+        self.coordinates = coords
 
     def set_player(self, player, character):
         if player == 'Player 1':
@@ -162,60 +171,48 @@ class MUDGame:
             return False
         return True
 
-    def action_move(self, move: str) -> bool:
+    def action_move(self, direction: str) -> bool:
         """Carry out the move in the given direction.
         Return True if entering next room, else False.
         """
         # entering next room
-        if self.current_room.grid.get_position() == [
-                0, 2
-        ] and move == 'w' and self.current_room.next_room(move):
-            self.current_room = self.current_room.next_room(move)
-            self.current_room.grid.move([4, 2])
+        if self.get_position() == (0, 2) and direction == 'w' and self.current_room.next_room(direction):
+            self.current_room = self.current_room.next_room(direction)
+            self.move((4, 2))
             next_room = True
-        elif self.current_room.grid.get_position() == [
-                2, 0
-        ] and move == 'a' and self.current_room.next_room(move):
-            self.current_room = self.current_room.next_room(move)
-            self.current_room.grid.move([2, 4])
+        elif self.get_position() == (2, 0) and direction == 'a' and self.current_room.next_room(direction):
+            self.current_room = self.current_room.next_room(direction)
+            self.move((2, 4))
             next_room = True
-        elif self.current_room.grid.get_position() == [
-                4, 2
-        ] and move == 's' and self.current_room.next_room(move):
-            self.current_room = self.current_room.next_room(move)
-            self.current_room.grid.move([0, 2])
+        elif self.get_position() == (4, 2) and direction == 's' and self.current_room.next_room(direction):
+            self.current_room = self.current_room.next_room(direction)
+            self.move((0, 2))
             next_room = True
-        elif self.current_room.grid.get_position() == [
-                2, 4
-        ] and move == 'd' and self.current_room.next_room(move):
-            self.current_room = self.current_room.next_room(move)
-            self.current_room.grid.move([2, 0])
+        elif self.get_position() == (2, 4) and direction == 'd' and self.current_room.next_room(direction):
+            self.current_room = self.current_room.next_room(direction)
+            self.move((2, 0))
             next_room = True
 
         # moving in current room
-        elif move == 'w' and self.current_room.grid.get_position(
+        elif direction == 'w' and self.get_position(
         )[0] != 0:
-            current_position = self.current_room.grid.get_position()
-            current_position[0] = current_position[0] - 1
-            self.current_room.grid.move(current_position)
+            x, y = self.get_position()
+            self.move((x - 1, y))
             next_room = False
-        elif move == 's' and self.current_room.grid.get_position(
+        elif direction == 's' and self.get_position(
         )[0] != 4:
-            current_position = self.current_room.grid.get_position()
-            current_position[0] = current_position[0] + 1
-            self.current_room.grid.move(current_position)
+            x, y = self.get_position()
+            self.move((x + 1, y))
             next_room = False
-        elif move == 'a' and self.current_room.grid.get_position(
+        elif direction == 'a' and self.get_position(
         )[1] != 0:
-            current_position = self.current_room.grid.get_position()
-            current_position[1] = current_position[1] - 1
-            self.current_room.grid.move(current_position)
+            x, y = self.get_position()
+            self.move((x, y - 1))
             next_room = False
-        elif move == 'd' and self.current_room.grid.get_position(
+        elif direction == 'd' and self.get_position(
         )[1] != 4:
-            current_position = self.current_room.grid.get_position()
-            current_position[1] = current_position[1] + 1
-            self.current_room.grid.move(current_position)
+            x, y = self.get_position()
+            self.move((x, y + 1))
             next_room = False
         else:
             # unreachable; throw AssertionError if reached
@@ -224,10 +221,11 @@ class MUDGame:
 
     def action_pickup(self) -> None:
         """Pick up items in current room"""
-        if self.current_room.grid.is_item():
-            item = self.current_room.grid.get_item()
+        coord = self.get_position()
+        if self.current_room.grid.is_item(coord):
+            item = self.current_room.grid.get_item(coord)
             self.player1.add_item(item)
-            self.current_room.grid.clear_tile()
+            self.current_room.grid.clear_tile(coord)
 
     def do_action(self, actor: characters.Character, enemy_party, action) -> bool:
         """Carry out the selected action by the actor on the target.
@@ -277,7 +275,8 @@ class MUDGame:
     def run(self) -> None:
         print('The game will begin.\n')
         while not self.gameOver:
-            if not self.current_room.grid.is_encounter():
+            coord = self.get_position()
+            if not self.current_room.grid.is_encounter(coord):
                 # Prompt movement
                 self.current_room.display_room()
                 move = self.current_room.grid.prompt_movement()

@@ -220,16 +220,16 @@ class Grid:
             ]
             for _ in range(5)
         ]
-        self.coordinates = [x, y]
+        # self.coordinates = [x, y]
 
     def get_tile(self, x: int, y: int):
         assert 0 <= x < 5
         assert 0 <= y < 5
         return self.grid[x][y]
         
-    def get_position(self) -> list:
-        """Return user position"""
-        return self.coordinates
+    # def get_position(self) -> list:
+    #     """Return user position"""
+    #     return self.coordinates
 
     def spawn(self, x: int, y: int, thing: "Enemy | Item") -> None:
         if isinstance(thing, Item):
@@ -253,35 +253,35 @@ class Grid:
         assert index is not None
         return options[index]
         
-    def move(self, position : list):
-        """Update user position and coordinates in the room"""
-        self.coordinates = position
+    # def move(self, position : list):
+    #     """Update user position and coordinates in the room"""
+    #     self.coordinates = position
     
-    def is_encounter(self) -> bool:
+    def is_encounter(self, coord: tuple[int, int]) -> bool:
         """Return true if user coordinates are currently on a creature tile."""
-        x, y = self.get_position()
+        x, y = coord
         return bool(self.get_tile(x, y).enemies)
 
-    def get_enemies(self):
+    def get_enemies(self, coord: tuple[int, int]):
         """Return the enemies on that tile."""
-        x, y = self.get_position()
+        x, y = coord
         return self.get_tile(x, y).enemies
 
-    def is_item(self):
+    def is_item(self, coord: tuple[int, int]):
         """Return true if user coordinates are currently on a item tile."""
-        x, y = self.get_position()
+        x, y = coord
         return bool(self.get_tile(x, y).item)
             
-    def get_item(self) -> Item:
+    def get_item(self, coord: tuple[int, int]) -> Item:
         """If user is on an item tile, return the item on that tile"""
-        x, y = self.get_position()
+        x, y = coord
         item = self.get_tile(x, y).item
         assert item is not None
         return item
         
-    def clear_tile(self):
+    def clear_tile(self, coord: tuple[int, int]):
         """After a defeating a creature or picking up an item, remove it from the grid"""
-        x, y = self.get_position()
+        x, y = coord
         self.get_tile(x, y).clear_all()
 
 

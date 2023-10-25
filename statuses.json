@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Sleeping",
+        "description": "Target cannot take action based on the count. At the end of the target's turn, reduce the count by 1.",
+        "count": 2
+    },
+    {
+        "name": "Corrupted",
+        "description": "Target attacks indiscriminately, At the end of the turn, reduce the count by 1.",
+        "count": 1
+    },
+    {
+        "name": "Infiltrated",
+        "description": "Target takes 10% more damage when attacked by Glitch Type enemies. At the end of the turn, reduce count by 1.",
+        "count": 1
+    },
+    {
+        "name": "Phantom",
+        "description": "Target has an increased chance to dodge all attacks. At the end of the turn, reduce count by 1.",
+        "count": 1
+    },
+    {
+        "name": "Resonance",
+        "description": "Target gains a random damage boost between 1 and 10 extra damage. At the end of the turn, reduce count by 1.",
+        "count": 3
+    },
+    {
+        "name": "Nightfall",
+        "description": "Target increases their attack and accuracy of their skills, as well as gains the ability to leech off of the opponent's health. At the end of the turn, reduce count by 1.",
+        "count": 5
+    }
+]

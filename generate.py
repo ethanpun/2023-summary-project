@@ -20,11 +20,23 @@ def opp(direction: str) -> str:
 def maze() -> Room:
     generator = MazeGenerator()
     start_room = generator.start_room()
-    generator.grow(start_room)
+    generator.generate(start_room)
     return start_room
 
 
 class MazeGenerator:
+    """Encapsulates data necessary for generating a set of
+    connected rooms.
+
+    Attributes:
+    - total_rooms: int
+
+    Methods:
+    + start_room() -> Room
+      returns the starting room of the maze
+    + generate(room, n: int) -> None
+      Generate the maze, starting from the given room
+    """
     def __init__(self) -> None:
         self.total_rooms = 0
         start_room = Room(number=self.total_rooms)
@@ -45,12 +57,12 @@ class MazeGenerator:
         """Returns the entrance (start room)"""
         return self._start_room
 
-    def grow(self, room: Room, n: int = 2, depth=0) -> None:
-        """Add n rooms to room"""
+    def generate(self, room: Room, n: int = 2, depth=0) -> None:
+        """Add n rooms to room, recursively"""
         if room is self.start_room():
             # First room only has one direction, w
             next_room = self.add_room(room, 'w')
-            self.grow(
+            self.generate(
                 next_room,
                 n=random.randint(2, 3),
                 depth=depth + 1
@@ -66,7 +78,7 @@ class MazeGenerator:
                     next_room = self.add_room(room, direction, boss=Springtrap())
                 else:
                     next_room = self.add_room(room, direction)
-                self.grow(
+                self.generate(
                     next_room,
                     n=random.randint(2, 3),
                     depth=depth + 1
